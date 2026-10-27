@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grafieken en formules</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --roze: rgb(233,36,213);
+  --paars: rgb(94,6,150);
+  --cyaan: rgb(69,237,255);
+  --tekst: #2a1440;
+  --goed: #1a9e5a;
+  --fout: #d62828;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Montserrat',sans-serif;background:#faf6fd;color:var(--tekst);font-size:17px;line-height:1.5}
+header{background:linear-gradient(90deg,var(--paars),var(--roze));color:#fff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+header h1{margin:0;font-size:1.25rem;font-weight:800}
+.score{background:#fff;color:var(--paars);border:none;border-radius:999px;padding:8px 16px;font:800 1rem 'Montserrat',sans-serif;cursor:pointer}
+main{max-width:860px;margin:0 auto;padding:16px}
+.mods{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.mod{flex:1 1 200px;border:2px solid var(--paars);background:#fff;color:var(--paars);border-radius:14px;padding:10px;font:700 .95rem 'Montserrat',sans-serif;cursor:pointer;display:flex;align-items:center;gap:8px;text-align:left}
+.mod .nr{background:var(--cyaan);color:var(--paars);border-radius:50%;min-width:30px;height:30px;display:grid;place-items:center;font-weight:800}
+.mod.on{background:var(--paars);color:#fff}
+.secs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.sec{border:2px solid var(--roze);background:#fff;color:var(--roze);border-radius:999px;padding:7px 14px;font:700 .9rem 'Montserrat',sans-serif;cursor:pointer}
+.sec.on{background:var(--roze);color:#fff}
+.secinfo{font-weight:700;color:var(--paars);margin:4px 0 8px}
+.dots{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.dot{width:40px;height:40px;border-radius:50%;border:2px solid #cbb8da;background:#fff;color:var(--paars);font:800 .95rem 'Montserrat',sans-serif;cursor:pointer}
+.dot.d2{background:var(--roze);border-color:var(--roze);color:#fff}
+.dot.d1{background:var(--paars);border-color:var(--paars);color:#fff}
+.dot.sk{border-style:dashed;border-color:#999;color:#777}
+.dot.bz{border-color:var(--roze)}
+.dot.cur{outline:4px solid var(--cyaan);outline-offset:2px}
+.card{background:#fff;border-radius:18px;padding:18px;box-shadow:0 4px 18px rgba(94,6,150,.10);border-top:6px solid var(--cyaan)}
+.qhead{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:flex-start}
+.qnr{font-weight:800;color:var(--roze);font-size:1.05rem}
+.et{font-size:.78rem;background:#e9fdff;border:1px solid var(--cyaan);color:var(--paars);padding:4px 10px;border-radius:12px;max-width:100%}
+.lines p{margin:0 0 4px}
+.context{background:#f3e9fa;border-left:5px solid var(--paars);padding:10px 12px;border-radius:10px;margin:12px 0}
+.qtext{font-weight:700;font-size:1.08rem;margin:12px 0}
+h2{color:var(--paars);margin:0 0 10px;font-size:1.3rem}
+h3{color:var(--paars);margin:0 0 6px;font-size:1.05rem}
+.graph{width:100%;max-width:470px;display:block;margin:8px auto;background:#fff;touch-action:manipulation;user-select:none}
+.graph .rl{stroke:#e7dcef;stroke-width:1}
+.graph .as{stroke:#3b2352;stroke-width:2}
+.graph .pijl{fill:#3b2352}
+.graph text{font:600 12px 'Montserrat',sans-serif;fill:#3b2352}
+.graph .aslab{font-weight:800;font-size:14px;fill:var(--paars)}
+.graph .ln{fill:none;stroke-width:3.5;stroke-linecap:round}
+.graph .ln.roze{stroke:rgb(233,36,213)}
+.graph .ln.paars{stroke:rgb(94,6,150)}
+.graph .ln.dash{stroke:var(--goed);stroke-dasharray:9 6}
+.graph .gd{fill:none;stroke:var(--goed);stroke-width:2.5;stroke-dasharray:6 5}
+.graph .gdc{fill:none;stroke:var(--goed);stroke-width:3}
+.graph .gdt{fill:var(--goed);font-weight:800;font-size:14px;paint-order:stroke;stroke:#fff;stroke-width:4px}
+.graph .pt{fill:var(--paars)}
+.graph .ptl{fill:var(--paars);font-weight:800;font-size:15px;paint-order:stroke;stroke:#fff;stroke-width:4px}
+.graph .u-user{fill:var(--roze)}
+.graph .u-right{fill:var(--goed)}
+.graph .u-wrong{fill:var(--fout)}
+.graph .kruis{stroke:#fff;stroke-width:2.5}
+.graph .mis{fill:none;stroke:var(--goed);stroke-width:3;stroke-dasharray:4 3}
+.graph .poly{fill:rgba(233,36,213,.15);stroke:var(--roze);stroke-width:2.5}
+.graph .ghost{fill:rgba(233,36,213,.35);pointer-events:none}
+.graph.klik{cursor:crosshair}
+.legend{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;font-weight:700;font-size:.95rem;margin-top:4px}
+.legend span{display:flex;align-items:center;gap:6px}
+.sw{display:inline-block;width:26px;height:6px;border-radius:3px}
+.sw.roze{background:var(--roze)}
+.sw.paars{background:var(--paars)}
+.antwoord{margin:14px 0;display:flex;flex-direction:column;align-items:center;gap:8px}
+.coord{display:flex;align-items:flex-start;gap:6px;font-size:2rem;font-weight:800;color:var(--paars)}
+.coord label{display:flex;flex-direction:column;align-items:center}
+.coord small{font-size:.85rem}
+.haak{line-height:2.4}
+input.ant{width:84px;font:800 1.3rem 'Montserrat',sans-serif;text-align:center;border:3px solid var(--paars);border-radius:10px;padding:6px;color:var(--tekst)}
+input.ant:focus{outline:3px solid var(--cyaan)}
+input.ant.g{border-color:var(--goed);background:#e7f8ef}
+input.ant.f{border-color:var(--fout);background:#fdecec}
+input.ant.small{width:62px;font-size:1.1rem}
+.numrij{display:flex;align-items:center;gap:8px;font-weight:700;font-size:1.1rem}
+table.tab{border-collapse:collapse;margin:8px auto;font-weight:700}
+table.tab th,table.tab td{border:2px solid var(--paars);padding:6px 8px;text-align:center;min-width:52px}
+table.tab th{background:var(--paars);color:#fff}
+.opts{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.opt{font:700 1.05rem 'Montserrat',sans-serif;border:3px solid var(--paars);background:#fff;color:var(--paars);border-radius:12px;padding:10px 18px;cursor:pointer;min-width:90px}
+.opt:hover:not(:disabled){background:#f3e9fa}
+.opt.g{background:var(--goed);border-color:var(--goed);color:#fff}
+.opt.f{background:#fdecec;border-color:var(--fout);color:var(--fout);text-decoration:line-through}
+.opt.hint{border-color:var(--goed);box-shadow:0 0 0 4px rgba(26,158,90,.25)}
+.tip{font-size:.92rem;color:#5b4470;text-align:center}
+.tip p{margin:0}
+.knoppen,.navknoppen{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px}
+.navknoppen{justify-content:space-between;border-top:2px solid #f0e6f7;padding-top:12px;margin-top:16px}
+.btn{font:700 1rem 'Montserrat',sans-serif;border-radius:12px;padding:11px 18px;border:none;cursor:pointer}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.check{background:var(--roze);color:#fff}
+.btn.hint{background:var(--cyaan);color:var(--paars)}
+.btn.skip{background:#fff;border:2px solid #bbb;color:#666}
+.btn.wis{background:#fff;border:2px solid var(--roze);color:var(--roze);padding:7px 12px;font-size:.9rem}
+.btn.nav{background:#fff;border:2px solid var(--paars);color:var(--paars)}
+.btn.nav.glow{background:var(--paars);color:#fff}
+.btn.groot{background:var(--roze);color:#fff;font-size:1.1rem;display:block;margin:18px auto 0}
+.box{border-radius:12px;padding:12px 14px;margin-top:12px}
+.box.good{background:#e7f8ef;border-left:6px solid var(--goed)}
+.box.bad{background:#fdeaf3;border-left:6px solid var(--roze)}
+.box.info{background:#f3e9fa;border-left:6px solid var(--paars)}
+.box.hintbox{background:#e9fdff;border-left:6px solid var(--cyaan)}
+.box.oplossing{background:#fff7e0;border-left:6px solid #f2b200}
+.box b{display:block;margin-bottom:2px}
+.uitleg-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+@media (max-width:700px){.uitleg-grid{grid-template-columns:1fr}}
+.ezel{background:var(--cyaan);color:var(--paars);font-weight:800;border-radius:12px;padding:10px 14px;margin-top:12px}
+.waarom{background:#f3e9fa;border-radius:12px;padding:12px 14px;margin-top:14px}
+.res td,.res th{padding:8px 10px;border-bottom:1px solid #eee;text-align:left}
+.res{width:100%;border-collapse:collapse;margin:10px 0}
+.res th{color:var(--paars)}
+.linkbtn{background:none;border:none;color:var(--roze);font:700 .95rem 'Montserrat',sans-serif;cursor:pointer;text-decoration:underline;padding:2px}
+.graph .ln.blauw{stroke:#1d6fd1}
+.graph .ln.teal{stroke:#16a394}
+.graph .dotf.roze{fill:var(--roze)}
+.graph .dotf.blauw{fill:#1d6fd1}
+.graph .dotf.paars{fill:var(--paars)}
+.graph .zz{fill:none;stroke:#3b2352;stroke-width:2}
+.graph .aslab.boek{font-style:italic;font-weight:600;font-size:12px;fill:#3b2352;paint-order:stroke;stroke:#fff;stroke-width:4px}
+.graph .tagc.roze{fill:var(--roze)}
+.graph .tagc.blauw{fill:#1d6fd1}
+.graph .tagc.teal{fill:#16a394}
+.graph .tagt{fill:#fff;font-weight:800;font-size:13px}
+.graph .tagl{font-weight:800;font-size:13px;paint-order:stroke;stroke:#fff;stroke-width:4px}
+.graph .tagl.roze{fill:var(--roze)}
+.graph .tagl.blauw{fill:#1d6fd1}
+.graph .tagl.teal{fill:#16a394}
+.graph .hit{fill:none;stroke:transparent;stroke-width:24;cursor:pointer;pointer-events:stroke}
+.graph .hit:hover{stroke:rgba(69,237,255,.35)}
+.graph .ln.sel-blauw{stroke:#1d5fd6;stroke-width:7}
+.graph .ln.sel-rood{stroke:#e01b1b;stroke-width:7}
+.graph .vd{stroke:#3b2352;stroke-width:1.5;stroke-dasharray:4 4}
+.graph .note{font-weight:700;font-size:12px;fill:var(--paars);paint-order:stroke;stroke:#fff;stroke-width:6px}
+.duo{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.duo .graph{max-width:340px;flex:1 1 280px;margin:0}
+.wie{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-weight:700;font-size:.9rem}
+.wie .naam{background:rgba(255,255,255,.18);border-radius:999px;padding:6px 12px}
+.wie .wolk{font-size:.8rem;opacity:.95}
+.wie button{background:transparent;border:2px solid #fff;color:#fff;border-radius:999px;padding:5px 12px;font:700 .85rem 'Montserrat',sans-serif;cursor:pointer}
+.login{max-width:440px;margin:24px auto}
+.login label{display:block;font-weight:700;color:var(--paars);margin:14px 0 4px}
+.login input{width:100%;font:700 1.15rem 'Montserrat',sans-serif;border:3px solid var(--paars);border-radius:12px;padding:10px 12px;color:var(--tekst)}
+.login input:focus{outline:3px solid var(--cyaan)}
+.login input.pin{letter-spacing:.5em;width:170px}
+.login .klein{font-size:.85rem;color:#5b4470;margin-top:4px}
+.login .btn{width:100%;margin-top:18px;font-size:1.1rem}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--paars);color:#fff;font-weight:700;padding:12px 18px;border-radius:14px;box-shadow:0 6px 20px rgba(0,0,0,.2);z-index:50;max-width:calc(100% - 32px)}
+footer{text-align:center;font-size:.8rem;color:#8a76a0;padding:20px}
+</style>
+</head>
+<body>
+<header>
+  <h1>📈 Grafieken en formules</h1>
+  <div class="wie" id="wie"></div>
+  <button class="score" id="score" onclick="go(cur.mod,'result',0)">⭐ 0 punten</button>
+</header>
+<main id="app"></main>
+<footer>Wiskunde VMBO Basis · Algebraïsche verbanden</footer>
+
+<script>
+/* ============ EINDTERMEN ============ */
+const ET = {
+  a: "WI/K/4.3 – coördinaten van punten aflezen en tekenen in een assenstelsel (ook negatief)",
+  b: "WI/K/4.3 – twee grafieken vergelijken en het snijpunt vaststellen en uitleggen",
+  c: "WI/K/4.1 en 4.5 – bij een formule een tabel maken, y berekenen en de grafiek tekenen",
+  d: "WI/K/4.3 – het verloop van een grafiek beschrijven (stijgend, dalend, gelijk) en zien hoe steil een grafiek is",
+  e: "WI/K/4.3 – twee grafieken vergelijken, de verschillen uitleggen en het snijpunt vaststellen",
+  f: "WI/K/4.3 en 4.5 – waarden aflezen uit een grafiek en controleren met de woordformule",
+  teken: "WI/K/4.3 – in een gegeven assenstelsel een grafiek tekenen bij een tabel",
+  tabel: "WI/K/4.1 – bij een woordformule een tabel maken"
+};
+
+/* ============ ASSENSTELSELS ============ */
+const G = {xmin:-6,xmax:6,ymin:-6,ymax:6};
+const FIETS = {xmin:0,xmax:6,ymin:0,ymax:24,ystep:2,xlabel:"uren",ylabel:"euro",
+  lines:[{f:x=>2*x+4,kl:'roze',naam:'Fietsverhuur A'},{f:x=>4*x,kl:'paars',naam:'Fietsverhuur B'}]};
+const TEMP = {xmin:0,xmax:8,ymin:-6,ymax:6,xlabel:"uur",ylabel:"°C",
+  lines:[{f:x=>x-4,kl:'roze',naam:'Stad Noord'},{f:x=>2-x/2,kl:'paars',naam:'Stad Zuid'}]};
+const TAXI = {xmin:0,xmax:6,ymin:0,ymax:20,ystep:2,xlabel:"km",ylabel:"euro",
+  lines:[{f:x=>3*x+2,kl:'roze',naam:'Taxi Rood'},{f:x=>x+6,kl:'paars',naam:'Taxi Blauw'}]};
+const VRIES = {xmin:0,xmax:6,ymin:-8,ymax:6,xlabel:"uur",ylabel:"°C"};
+
+const FIETS_CTX = ["Je wilt een fiets huren.","De grafiek laat zien wat het kost bij twee bedrijven."];
+const TEMP_CTX = ["Het is een koude nacht.","De grafiek laat de temperatuur zien in twee steden.","Om 0 uur is het middernacht."];
+const TAXI_CTX = ["Je neemt een taxi.","Er zijn twee taxibedrijven.","De grafiek laat zien wat een rit kost."];
+
+/* ============ GRAFIEKEN UIT HOOFDSTUK 2 ============ */
+// 2.1 opdracht 1: temperatuur van Nard
+function tempF(x){
+  if(x<=9.5) return 2.2*(x-7);
+  if(x<=10) return 5.5+0.5*Math.sin((x-9.5)/0.5*Math.PI/2);
+  if(x<=11.75) return 6;
+  if(x<=12.25){ const t=x-11.75; return 6-6*t*t; }
+  if(x<=13) return -6*(x-13);
+  if(x<=14) return -3+3*(14-x)*(14-x);
+  if(x<=15){ const t=x-14; return -3+0.857*t*t; }
+  if(x<=16.33) return -2.143+1.714*(x-15);
+  if(x<=17.33){ const t=x-16.33; return 0.137+1.72*t-0.857*t*t; }
+  return 1;
+}
+const TEMP21 = {boek:true,xmin:7,xmax:19,ymin:-3,ymax:6,xzaag:true,cw:30,ch:28,xlabel:'tijd in uren →',ylabel:'temperatuur in °C →',lines:[{f:tempF,kl:'roze'}]};
+const TEMP21_SEGS = [{from:7,to:10},{from:10,to:11.75},{from:11.75,to:14},{from:14,to:17.33},{from:17.33,to:19}];
+const TEMP21_CTX = ['Nard heeft op één dag de temperatuur opgeschreven.','Hij deed dat van 7:00 uur tot 19:00 uur.','De grafiek hoort bij zijn metingen.'];
+
+// 2.1 voorbeeld + opdracht 2: winst
+const WINST_P = [[0,280],[2,240],[4,80],[6,80],[6.25,96],[6.5,124],[6.75,148],[7,160],[10,200]];
+const WINST = {boek:true,xmin:0,xmax:10,ymin:0,ymax:280,ystep:40,cw:36,ch:32,xlabel:'tijd in jaren →',ylabel:'winst in miljoenen →',lines:[{pts:WINST_P,kl:'roze'}]};
+const WINST_SEGS = [{pts:WINST_P.slice(0,2)},{pts:WINST_P.slice(1,3)},{pts:WINST_P.slice(2,4)},{pts:WINST_P.slice(3,8)},{pts:WINST_P.slice(7,9)}];
+const WINST_CTX = ['De grafiek laat de winst van een bedrijf zien.','Winst is het geld dat een bedrijf overhoudt.'];
+
+// 2.1 opdracht 3: Carla duikt
+const CARLA_P = [[0,0],[5,-20],[10,-30],[15,-30],[20,-15],[25,-5],[30,0]];
+const CARLA = {boek:true,xmin:0,xmax:30,xstep:5,ymin:-30,ymax:5,ystep:5,cw:50,ch:30,xlabel:'aantal minuten →',ylabel:'diepte in meters →'};
+const CARLA_L = Object.assign({},CARLA,{lines:[{pts:CARLA_P,kl:'roze',dots:true}]});
+const CARLA_SEGS = CARLA_P.slice(0,-1).map((p,i)=>({pts:[p,CARLA_P[i+1]]}));
+const CARLA_CTX = ['Carla doet aan diepzeeduiken.','In de tabel zie je hoe diep ze zwemt tijdens een duik.'];
+const CARLA_TAB = {lx:'aantal minuten',ly:'diepte in meters',xs:CARLA_P.map(p=>p[0]),ys:CARLA_P.map(p=>p[1])};
+
+// 2.1 opdracht 4: Jolanda
+const JOL_P = [[0,500],[1,460],[2,250],[3,250],[4,320],[5,350],[6,350]];
+const JOLANDA = {boek:true,xmin:0,xmax:6,ymin:200,ymax:500,ystep:50,yzaag:true,cw:52,ch:32,xlabel:'aantal dagen vakantie →',ylabel:"bedrag in euro's →",lines:[{pts:JOL_P,kl:'roze',dots:true}]};
+const JOL_CTX = ['Jolanda houdt in de vakantie bij hoeveel euro er op haar bankrekening staat.','Je ziet de resultaten in de tabel en in de grafiek.'];
+const JOL_TAB = {lx:'aantal dagen vakantie',ly:"bedrag in euro's",xs:JOL_P.map(p=>p[0]),ys:JOL_P.map(p=>p[1])};
+
+// 2.1 leerdoelen: Ingrid
+const INGRID = {boek:true,xmin:0,xmax:10,ymin:0,ymax:14,ystep:2,cw:36,ch:28,xlabel:'tijd in kwartieren →',ylabel:'afstand in km →',lines:[{pts:[[0,0],[4,8],[5,9.2],[6,9.9],[7,10.5],[9.5,14]],kl:'roze'}]};
+
+// 2.1 O3: dolfijn
+const DOLFIJN = {boek:true,xmin:0,xmax:30,xstep:5,ymin:-20,ymax:8,ystep:4,cw:50,ch:30,xlabel:'tijd in seconden →',ylabel:'hoogte in meters →',lines:[{pts:[[0,-12],[5,-8],[10,0],[15,6],[20,-6],[25,-12],[30,-20]],kl:'roze',smooth:true,dots:true}]};
+
+// 2.2 opdracht 5/6: Flixbus en auto
+const RIA_P = [[7,0],[9.5,250],[10.25,330],[10.5,330],[12,500]];
+const BUS_P = [[6,0],[9,250],[9.75,250],[11,350],[11.5,350],[13,500]];
+const FLIX = {boek:true,xmin:6,xmax:13,ymin:0,ymax:500,ystep:100,xzaag:true,xrot:true,xfmt:tijd,cw:34,ch:34,xlabel:'tijd in uren →',ylabel:'afstand in km →'};
+const RIA_L = {pts:RIA_P,kl:'roze',tag:{x:12,y:535,t:'1',rond:true}};
+const BUS_L = {pts:BUS_P,kl:'blauw',tag:{x:13,y:535,t:'2',rond:true}};
+const FLIX1 = Object.assign({},FLIX,{lines:[RIA_L]});
+const FLIX2 = Object.assign({},FLIX,{lines:[BUS_L]});
+const FLIXB = Object.assign({},FLIX,{lines:[RIA_L,BUS_L]});
+const FLIX_CTX = ['Wout gaat met de Flixbus van Amsterdam naar Parijs.','De bus stopt onderweg twee keer.','Ria gaat met de auto van Amsterdam naar Parijs.'];
+
+// 2.2 voorbeeld + opdracht 7: Jan en Alex
+const JANALEX = {boek:true,xmin:0,xmax:60,xstep:15,ymin:0,ymax:35,ystep:5,cw:80,ch:28,xlabel:'tijd in minuten →',ylabel:'afstand in km →',
+  lines:[{pts:[[0,0],[15,10],[30,19],[45,25],[60,27]],kl:'blauw',smooth:true,tag:{x:31,y:23,t:'Alex',a:'end'}},
+         {pts:[[0,0],[15,4],[30,13],[45,25],[60,33]],kl:'roze',smooth:true,tag:{x:36,y:15,t:'Jan',a:'start'}}]};
+const JANALEX_CTX = ['Je ziet de grafieken van twee fietsers: Jan en Alex.'];
+
+// 2.2 opdracht 8: Ger en Rina
+const GERRINA = {boek:true,xmin:0,xmax:20,ymin:0,ymax:4,ystep:0.5,xzaag:true,xevery:4,yevery:2,cw:18,ch:32,xfmt:v=>'8:'+String(v).padStart(2,'0'),xlabel:'tijd in uren →',ylabel:'afstand in km →',
+  lines:[{pts:[[0,0],[4,0.9],[8,1.5],[12,2.1],[16,3],[18,4]],kl:'teal',smooth:true,tag:{x:18.8,y:3.3,t:'A',rond:true}},
+         {pts:[[4,0],[6,1],[7,1],[8,1.5],[10,2.5],[12,2.5],[13,3.5],[14,3.5],[15,4]],kl:'roze',tag:{x:11.6,y:3.3,t:'B',rond:true}}]};
+const GERRINA_CTX = ['Ger fietst naar school.','Rina gaat met de bus naar school.','In het assenstelsel zie je hun grafieken.'];
+
+// 2.2 opdracht 9: Noortje en Bram
+const NOORTJE_P = [[0,53],[2,86],[4,103],[6,120],[8,134],[10,145],[12,155]];
+const BRAM_P = [[0,50],[2,80],[4,100],[6,120],[8,136],[10,150],[12,163]];
+const NOORTJE_L = {pts:NOORTJE_P,kl:'roze',smooth:true,tag:{x:8.4,y:120,t:'Noortje',a:'start'}};
+const LENGTE = {boek:true,xmin:0,xmax:12,ymin:50,ymax:170,ystep:10,yzaag:true,xevery:2,cw:32,ch:20,snapY:1,xlabel:'leeftijd in jaren →',ylabel:'lengte in centimeters →',lines:[NOORTJE_L]};
+const LENGTE2 = Object.assign({},LENGTE,{lines:[NOORTJE_L,{pts:BRAM_P,kl:'blauw',smooth:true,tag:{x:8.4,y:150,t:'Bram',a:'end'}}]});
+const LENGTE_CTX = ['Van de tweeling Noortje en Bram is elke twee jaar de lengte gemeten.'];
+
+// 2.2 leerdoelen: Franz en Wim
+const FRANZWIM = {boek:true,xmin:0,xmax:8,ymin:0,ymax:8,cw:44,ch:28,xlabel:'tijd in kwartieren →',ylabel:'afstand in km →',
+  lines:[{pts:[[0,0],[1,1.4],[2,3],[2.5,3.6],[3,4],[4,6],[4.5,6.6],[5,7],[6,8]],kl:'blauw',smooth:true,tag:{x:6,y:8.5,t:'F'}},
+         {pts:[[0,0],[1,2],[2,3],[3,3],[3.5,3.6],[4,4.8],[4.5,6],[5.5,6],[6,6.4],[7,7.2],[8,8]],kl:'roze',smooth:false,tag:{x:7.6,y:8.5,t:'W'}}]};
+
+// 2.3 opdracht 10: John
+const JOHN = {boek:true,xmin:0,xmax:50,xstep:5,ymin:0,ymax:400,ystep:50,xevery:2,cw:32,ch:30,xlabel:'tijd in weken →',ylabel:"bedrag in euro's →",lines:[{f:x=>7.5*x,from:0,to:49.5,kl:'roze'}]};
+// 2.3 voorbeeld + opdracht 11
+const VB25 = {boek:true,xmin:0,xmax:7,ymin:0,ymax:200,ystep:25,yevery:2,cw:44,ch:24,xlabel:'tijd in weken →',ylabel:"bedrag in euro's →",lines:[{f:x=>25*x,from:0,to:6.6,kl:'roze'}]};
+// 2.3 opdracht 12: Pat
+const PAT = {boek:true,xmin:0,xmax:8,ymin:0,ymax:80,ystep:8,cw:42,ch:22,xlabel:'aantal dagen →',ylabel:"kosten in euro's →",lines:[{f:x=>8*x+16,from:0,to:8,kl:'roze'}]};
+// 2.3 opdracht 13
+const UUR13 = {boek:true,xmin:0,xmax:10,ymin:0,ymax:120,ystep:10,yevery:2,cw:38,ch:20,xlabel:'tijd in uren →',ylabel:"bedrag in euro's →"};
+const UUR13L = Object.assign({},UUR13,{lines:[{f:x=>10*x+20,from:0,to:10,kl:'roze'}]});
+// 2.3 O14: David
+const DAVID = {boek:true,xmin:0,xmax:50,xstep:5,ymin:30,ymax:130,ystep:10,yzaag:true,xevery:2,cw:32,ch:22,xlabel:'aantal trainingen →',ylabel:"kosten in euro's →",lines:[{f:x=>2*x+30,from:0,to:50,kl:'roze'}]};
+// 2.3 leerdoelen
+const LD23 = {boek:true,xmin:0,xmax:6,ymin:12,ymax:36,ystep:4,yzaag:true,xevery:2,cw:46,ch:26,xlabel:'aantal uur →',ylabel:"bedrag in euro's →",lines:[{f:x=>4*x+12,from:0,to:6,kl:'roze'}]};
+
+/* ============ HULPFUNCTIES VOOR VRAGEN ============ */
+function hk(n){return Math.abs(n)===1?'hokje':'hokjes';}
+function walk(x,y,lab){
+  return [
+    'Start in de oorsprong (0, 0).',
+    x===0?'Je gaat niet naar links of rechts. Dus x = 0.':`Ga ${Math.abs(x)} ${hk(x)} naar ${x<0?'links':'rechts'}. Dus x = ${x}.`,
+    y===0?'Je gaat niet omhoog of omlaag. Dus y = 0.':`Ga dan ${Math.abs(y)} ${hk(y)} ${y<0?'omlaag':'omhoog'}. Dus y = ${y}.`,
+    `Punt ${lab} is (${x}, ${y}).`
+  ];
+}
+// Punt aflezen
+function R(x,y,lab,extra){
+  return Object.assign({
+    type:'read', cfg:G, pt:{x,y,label:lab}, ans:{x,y},
+    text:[`Kijk naar punt ${lab}.`,`Wat zijn de coördinaten van punt ${lab}?`],
+    hints:[
+      'Begin in het midden. Dat is de oorsprong (0, 0).',
+      x===0?`Punt ${lab} ligt precies op de y-as. Hoeveel hokjes ga je dan opzij?`
+           :`Ligt punt ${lab} links of rechts van de y-as? ${x<0?'Links betekent: x krijgt een min (-).':'Rechts betekent: x is een gewoon getal (plus).'} Tel de hokjes opzij.`,
+      y===0?`Punt ${lab} ligt precies op de x-as. Hoeveel hokjes ga je dan omhoog of omlaag?`
+           :`Ligt punt ${lab} boven of onder de x-as? ${y<0?'Onder betekent: y krijgt een min (-).':'Boven betekent: y is een gewoon getal (plus).'} Tel de hokjes omhoog of omlaag.`
+    ],
+    explain: walk(x,y,lab)
+  }, extra||{});
+}
+// Eén punt tekenen
+function P1(x,y,lab,extra){
+  return Object.assign({
+    type:'plot', cfg:G, targets:[{x,y,label:lab}],
+    text:[`Teken punt ${lab}(${x}, ${y}).`,'Klik op de juiste plek in het assenstelsel.'],
+    hints:[
+      'Begin in de oorsprong (0, 0).',
+      x===0?'x = 0: je gaat niet opzij.':`x = ${x}: ga ${Math.abs(x)} ${hk(x)} naar ${x<0?'links':'rechts'}.`,
+      y===0?'y = 0: je blijft op de x-as. Klik daar.':`y = ${y}: ga ${Math.abs(y)} ${hk(y)} ${y<0?'omlaag':'omhoog'}. Klik daar.`
+    ],
+    explain: walk(x,y,lab).concat(['Het groene rondje laat zien waar het punt moet staan.'])
+  }, extra||{});
+}
+// Tabel invullen bij formule
+function T(form,f,xs,show,hint3,extra){
+  return Object.assign({
+    type:'table', form, f, xs, show,
+    text:[`Maak de tabel af bij de formule ${form}.`,'Reken bij elke x de y uit.'],
+    hints:['Kijk naar de eerste x in de tabel.','Zet dat getal op de plek van x in de formule. Reken dan uit.',hint3],
+    explain:[`Vul elke x in de formule ${form} in.`].concat(xs.map(x=>`x = ${x} → y = ${show(x)}`))
+  }, extra||{});
+}
+// Punten uit tabel tekenen
+function PT(form,f,xs,extra){
+  const t = xs.map(x=>({x,y:f(x)}));
+  return Object.assign({
+    type:'plot', cfg:G, targets:t, f, tabel:{xs,f},
+    text:[`Hier zie je de tabel bij de formule ${form}.`,'Teken alle punten uit de tabel in het assenstelsel.'],
+    hints:[`Het eerste punt is (${xs[0]}, ${f(xs[0])}).`,'Bij elke kolom van de tabel hoort één punt: (x, y).',`Je moet ${xs.length} punten tekenen.`],
+    explain:['De punten zijn: '+t.map(p=>`(${p.x}, ${p.y})`).join(', ')+'.','De groene rondjes laten zien waar ze moeten staan.','Rode punten staan op de verkeerde plek. Klik erop om ze weg te halen.']
+  }, extra||{});
+}
+
+/* ============ LESSTOF ============ */
+const MODS = [
+/* ---------- MODULE 1 ---------- */
+{
+  kort:"Punten aflezen en tekenen", et:ET.a,
+  uitleg:{
+    titel:"Punten in een assenstelsel",
+    lines:['Een assenstelsel heeft twee lijnen.','De x-as loopt van links naar rechts.','De y-as loopt van onder naar boven.','Het midden heet de oorsprong. Dat is het punt (0, 0).','Een punt schrijf je als (x, y).','Eerst x: ga naar links of rechts.','Dan y: ga omhoog of omlaag.','Ga je naar links of omlaag? Dan krijgt het getal een min (-).'],
+    ezel:'Ezelsbruggetje: denk aan een glazenwasser. Eerst zet hij zijn trap onder het juiste raam: naar links of naar rechts (x). Pas daarna klimt hij omhoog of omlaag (y).',
+    graph:{cfg:G, ex:{points:[{x:-3,y:2,label:'P'}], guides:[{x:-3,y:2}]}},
+    caption:['Voorbeeld: punt P.','Je gaat 3 hokjes naar links. Dus x = -3.','Je gaat 2 hokjes omhoog. Dus y = 2.','Punt P is (-3, 2).'],
+    waarom:['Op een plattegrond of kaart zoek je zo een plek.','In een game weet de computer zo waar een poppetje staat.','Een bouwvakker of monteur leest zo een bouwtekening.']
+  },
+  opdr:[
+    R(3,2,'A',{context:['Een assenstelsel is net een plattegrond.','Met twee getallen vind je precies een plek terug.']}),
+    R(-4,1,'B'),
+    R(2,-3,'C'),
+    R(-3,-2,'D'),
+    R(0,-4,'E'),
+    P1(2,4,'P'),
+    P1(-3,2,'Q'),
+    P1(4,-1,'R'),
+    P1(-2,-5,'S'),
+    { type:'plot', cfg:G, connect:true,
+      targets:[{x:-1,y:3,label:'A'},{x:-1,y:-2,label:'B'},{x:4,y:-2,label:'C'}],
+      context:['Je maakt een schatkaart voor een spel.','De schat ligt in een driehoek.'],
+      text:['Teken de punten A(-1, 3), B(-1, -2) en C(4, -2).'],
+      hints:['Teken de punten één voor één. Begin met A.','Bij A(-1, 3) betekent de min: 1 hokje naar links.','B en C liggen allebei onder de x-as. Hun y is -2.'],
+      explain:['A(-1, 3): 1 hokje naar links, 3 hokjes omhoog.','B(-1, -2): 1 hokje naar links, 2 hokjes omlaag.','C(4, -2): 4 hokjes naar rechts, 2 hokjes omlaag.','De groene rondjes laten zien waar de punten moeten staan.'],
+      praise:['Je ziet nu de driehoek met de schat!']
+    }
+  ],
+  toets:[
+    R(-5,3,'F'),
+    R(4,-2,'G'),
+    P1(-4,-1,'H'),
+    P1(5,-3,'K'),
+    { type:'mc', cfg:G,
+      pts:[{x:2,y:3,label:'A'},{x:-3,y:2,label:'B'},{x:-2,y:-4,label:'C'},{x:3,y:-1,label:'D'}],
+      text:['Bij welk punt is x negatief (min) en y positief (plus)?'],
+      opts:['A','B','C','D'], ans:1,
+      hints:['x negatief betekent: het punt ligt links van de y-as.','y positief betekent: het punt ligt boven de x-as.','Zoek het punt dat links én boven ligt.'],
+      explain:['B ligt links van de y-as. Dus x is min.','B ligt boven de x-as. Dus y is plus.','B is (-3, 2).'],
+      guides:[{x:-3,y:2}]
+    }
+  ]
+},
+/* ---------- MODULE 2 ---------- */
+{
+  kort:"Grafieken vergelijken", et:ET.b,
+  uitleg:{
+    titel:"Twee grafieken in één assenstelsel",
+    lines:['Soms staan er twee grafieken in één assenstelsel.','Zo kun je ze makkelijk vergelijken.','Elke lijn heeft een eigen kleur.','Onder de grafiek zie je welke kleur bij wat hoort.','Aflezen gaat zo: zoek het getal op de x-as.','Ga recht omhoog naar de lijn.','Kijk dan naar links op de y-as.','Hoger op de grafiek betekent: meer. Bijvoorbeeld duurder of warmer.','Waar de lijnen elkaar kruisen, zijn ze even groot. Dat punt heet het snijpunt.'],
+    ezel:'Let op de stappen op de y-as. Soms is één hokje 2 euro!',
+    graph:{cfg:FIETS, ex:{guides:[{x:2,y:8}]}},
+    caption:['De lijnen kruisen bij 2 uur.','Daar kosten A en B allebei € 8.'],
+    waarom:['Je vergelijkt telefoonabonnementen of energieprijzen.','Je kiest de goedkoopste fietsverhuur of taxi.','In veel beroepen vergelijk je kosten in een grafiek.']
+  },
+  opdr:[
+    {type:'num',cfg:FIETS,context:FIETS_CTX,text:['Hoeveel euro kost 1 uur huren bij Fietsverhuur A?'],ans:6,unit:'euro',
+     hints:['Zoek de roze lijn. Dat is Fietsverhuur A.','Zoek op de x-as (uren) het getal 1.','Ga recht omhoog tot je de roze lijn raakt. Kijk dan naar links op de y-as.'],
+     explain:['Ga bij 1 uur omhoog naar de roze lijn.','Kijk dan naar links.','Je komt uit bij 6.','1 uur huren bij A kost € 6.'],guides:[{x:1,y:6}]},
+    {type:'num',cfg:FIETS,context:FIETS_CTX,text:['Hoeveel euro kost 1 uur huren bij Fietsverhuur B?'],ans:4,unit:'euro',
+     hints:['Zoek de paarse lijn. Dat is Fietsverhuur B.','Zoek op de x-as het getal 1.','Ga recht omhoog naar de paarse lijn. Kijk dan naar links.'],
+     explain:['Ga bij 1 uur omhoog naar de paarse lijn.','Kijk dan naar links.','Je komt uit bij 4.','1 uur huren bij B kost € 4.'],guides:[{x:1,y:4}]},
+    {type:'mc',cfg:FIETS,context:FIETS_CTX,text:['Welk bedrijf is goedkoper als je 1 uur huurt?'],opts:['Fietsverhuur A','Fietsverhuur B','Ze zijn even duur'],ans:1,
+     hints:['Kijk bij 1 uur naar beide lijnen.','Welke lijn ligt daar het laagst?','Lager betekent: minder euro. Dus goedkoper.'],
+     explain:['Bij 1 uur kost A € 6.','Bij 1 uur kost B € 4.','B ligt lager, dus B is goedkoper.'],guides:[{x:1,y:6},{x:1,y:4}]},
+    {type:'num',cfg:FIETS,context:FIETS_CTX,text:['Na hoeveel uur kosten A en B precies evenveel?'],ans:2,unit:'uur',
+     hints:['Even duur betekent: de lijnen raken elkaar.','Zoek het punt waar de roze en de paarse lijn elkaar kruisen.','Ga vanaf dat punt recht omlaag naar de x-as.'],
+     explain:['De lijnen kruisen bij het punt (2, 8).','Dat punt heet het snijpunt.','Na 2 uur kosten A en B allebei € 8.'],guides:[{x:2,y:8}]},
+    {type:'mc',cfg:FIETS,context:FIETS_CTX,text:['Welk bedrijf is goedkoper als je 5 uur huurt?'],opts:['Fietsverhuur A','Fietsverhuur B','Ze zijn even duur'],ans:0,
+     hints:['Zoek op de x-as het getal 5.','Ga omhoog naar beide lijnen.','Welke lijn ligt daar het laagst?'],
+     explain:['Bij 5 uur kost A € 14.','Bij 5 uur kost B € 20.','A ligt lager, dus A is goedkoper.'],guides:[{x:5,y:14},{x:5,y:20}]},
+    {type:'num',cfg:FIETS,context:FIETS_CTX,text:['Je huurt 5 uur een fiets.','Hoeveel euro is het verschil tussen A en B?'],ans:6,unit:'euro',
+     hints:['Lees af wat A kost bij 5 uur.','Lees af wat B kost bij 5 uur.','Trek het kleine bedrag af van het grote bedrag.'],
+     explain:['B kost € 20.','A kost € 14.','20 - 14 = 6.','Het verschil is € 6.'],guides:[{x:5,y:14},{x:5,y:20}]},
+    {type:'num',cfg:TEMP,context:TEMP_CTX,text:['Hoe warm is het in Stad Noord om 0 uur?'],ans:-4,unit:'graden',
+     hints:['De roze lijn is Stad Noord.','0 uur is helemaal links, op de y-as.','Waar begint de roze lijn? Let op: onder de 0 is het een min-getal.'],
+     explain:['De roze lijn begint bij -4.','Om middernacht is het in Noord -4 graden.','Dat is 4 graden onder nul.'],guides:[{x:0,y:-4}]},
+    {type:'num',cfg:TEMP,context:TEMP_CTX,text:['Hoe warm is het in Stad Zuid om 8 uur?'],ans:-2,unit:'graden',
+     hints:['De paarse lijn is Stad Zuid.','Zoek op de x-as het getal 8. Dat is helemaal rechts.','Kijk naar links op de y-as. Ligt het punt onder de 0?'],
+     explain:['Om 8 uur ligt de paarse lijn bij -2.','In Zuid is het dan -2 graden.','Dat is 2 graden onder nul.'],guides:[{x:8,y:-2}]},
+    {type:'mc',cfg:TEMP,context:TEMP_CTX,text:['Om hoe laat is het in beide steden even warm?'],opts:['2 uur','4 uur','6 uur'],ans:1,
+     hints:['Even warm betekent: de lijnen kruisen elkaar.','Zoek het snijpunt van de roze en de paarse lijn.','Ga vanaf het snijpunt recht naar de x-as.'],
+     explain:['De lijnen kruisen bij 4 uur.','Daar is het in beide steden 0 graden.'],guides:[{x:4,y:0}]},
+    {type:'mc',cfg:TEMP,context:TEMP_CTX,text:['Welke stad is om 2 uur het koudst?'],opts:['Stad Noord','Stad Zuid'],ans:0,
+     hints:['Zoek op de x-as het getal 2.','Kijk welke lijn daar het laagst ligt.','Lager betekent: kouder.'],
+     explain:['Om 2 uur is het in Noord -2 graden.','In Zuid is het dan 1 graad.','-2 is kouder dan 1.','Het laagste punt is het koudst.'],guides:[{x:2,y:-2},{x:2,y:1}]}
+  ],
+  toets:[
+    {type:'num',cfg:TAXI,context:TAXI_CTX,text:['Hoeveel euro kost een rit van 4 km bij Taxi Rood?'],ans:14,unit:'euro',
+     hints:['De roze lijn is Taxi Rood.','Zoek op de x-as het getal 4.','Ga omhoog naar de roze lijn. Kijk dan naar links. Let op: elk hokje is 2 euro.'],
+     explain:['Bij 4 km raakt de roze lijn de 14.','Een rit van 4 km bij Taxi Rood kost € 14.'],guides:[{x:4,y:14}]},
+    {type:'num',cfg:TAXI,context:TAXI_CTX,text:['Bij 0 km betaal je al een starttarief.','Hoeveel euro is het starttarief van Taxi Blauw?'],ans:6,unit:'euro',
+     hints:['De paarse lijn is Taxi Blauw.','0 km is helemaal links, op de y-as.','Waar begint de paarse lijn?'],
+     explain:['De paarse lijn begint bij 6.','Het starttarief van Taxi Blauw is € 6.'],guides:[{x:0,y:6}]},
+    {type:'num',cfg:TAXI,context:TAXI_CTX,text:['Bij hoeveel km kosten beide taxi\'s precies evenveel?'],ans:2,unit:'km',
+     hints:['Even duur betekent: de lijnen kruisen elkaar.','Zoek het snijpunt.','Ga vanaf het snijpunt recht omlaag naar de x-as.'],
+     explain:['De lijnen kruisen bij het punt (2, 8).','Bij 2 km kosten beide taxi\'s € 8.'],guides:[{x:2,y:8}]},
+    {type:'mc',cfg:TAXI,context:TAXI_CTX,text:['Je wilt 6 km rijden.','Welke taxi is dan goedkoper?'],opts:['Taxi Rood','Taxi Blauw','Ze zijn even duur'],ans:1,
+     hints:['Zoek op de x-as het getal 6.','Kijk welke lijn daar het laagst ligt.','Lager betekent: goedkoper.'],
+     explain:['Bij 6 km kost Taxi Rood € 20.','Bij 6 km kost Taxi Blauw € 12.','Taxi Blauw is goedkoper.'],guides:[{x:6,y:20},{x:6,y:12}]},
+    {type:'num',cfg:TEMP,context:TEMP_CTX,text:['Hoeveel graden is het verschil tussen Noord en Zuid om 8 uur?'],ans:6,unit:'graden',
+     hints:['Lees af hoe warm het om 8 uur is in Noord.','Lees af hoe warm het om 8 uur is in Zuid.','Tel de hokjes tussen de twee punten. Elk hokje is 1 graad.'],
+     explain:['Om 8 uur is het in Noord 4 graden.','In Zuid is het -2 graden.','Van -2 naar 0 is 2 graden. Van 0 naar 4 is 4 graden.','Samen is dat 6 graden verschil.'],guides:[{x:8,y:4},{x:8,y:-2}]}
+  ]
+},
+/* ---------- MODULE 3 ---------- */
+{
+  kort:"Grafiek bij een formule", et:ET.c,
+  uitleg:{
+    titel:"Van formule naar grafiek",
+    lines:['Een formule is een rekenregel.','Bijvoorbeeld: y = 2x + 1.','2x betekent: 2 keer x.','Stap 1: maak een tabel. Kies een paar x-waarden.','Stap 2: reken bij elke x de y uit.','Stap 3: zet de punten in het assenstelsel.','Stap 4: trek een lijn door de punten.'],
+    ezel:'Let op met min: 2 × -1 = -2.',
+    tabel:{xs:[-2,-1,0,1,2], f:x=>2*x+1},
+    graph:{cfg:G, ex:{lineSolid:{f:x=>2*x+1}, user:[-2,-1,0,1,2].map(x=>({x,y:2*x+1,kl:'user'}))}},
+    caption:['Bij x = 1 reken je: 2 × 1 + 1 = 3.','Dus het punt (1, 3) ligt op de grafiek.'],
+    waarom:['Een taxibedrijf rekent met een formule: starttarief + prijs per km.','Een loodgieter rekent: voorrijkosten + uurloon × uren.','Met een grafiek zie je meteen wat iets kost.']
+  },
+  opdr:[
+    {type:'num',text:['Bekijk de formule y = x + 2.','Wat is y als x = 3?'],ans:5,
+     hints:['Een formule is een rekenregel.','Vervang x door het getal 3.','Reken uit: 3 + 2.'],
+     explain:['x = 3.','y = 3 + 2 = 5.']},
+    {type:'num',text:['Bekijk de formule y = 2x.','Wat is y als x = 3?'],ans:6,
+     hints:['2x betekent: 2 keer x.','Vervang x door 3.','Reken uit: 2 × 3.'],
+     explain:['2x = 2 × 3 = 6.','Dus y = 6.']},
+    {type:'num',text:['Bekijk de formule y = 2x.','Wat is y als x = -2?'],ans:-4,
+     hints:['2x betekent: 2 keer x.','Je rekent dus: 2 × -2.','Een plus-getal keer een min-getal geeft een min-getal.'],
+     explain:['2 × 2 = 4.','Er staat een min bij de -2. Dus de uitkomst is ook min.','2 × -2 = -4.']},
+    T('y = x + 1', x=>x+1, [-2,-1,0,1,2], x=>`${x} + 1 = ${x+1}`, 'Bij x = -2 reken je: -2 + 1. Ga op de getallenlijn vanaf -2 één stap naar rechts.'),
+    T('y = 2x - 1', x=>2*x-1, [-1,0,1,2,3], x=>`2 × ${x} - 1 = ${2*x-1}`, '2x betekent: 2 keer x. Bij x = -1: eerst 2 × -1 = -2. Haal er dan nog 1 af.'),
+    PT('y = x + 1', x=>x+1, [-2,-1,0,1,2], {praise:['Zie je? De punten liggen op een rechte lijn.']}),
+    PT('y = 2x - 1', x=>2*x-1, [-1,0,1,2,3], {praise:['Alle punten liggen op één rechte lijn.']}),
+    {type:'plotLine',cfg:G,f:x=>-x+3,min:3,
+     text:['Bekijk de formule y = -x + 3.','Teken minstens 3 punten die op de grafiek liggen.'],
+     hints:['Maak eerst een kleine tabel. Kies bijvoorbeeld x = 0, x = 1 en x = 2.','Bij x = 0 reken je: y = 0 + 3.','Bij x = 1 reken je: y = -1 + 3.'],
+     explain:['x = 0 → y = 3. Punt (0, 3).','x = 1 → y = 2. Punt (1, 2).','x = 2 → y = 1. Punt (2, 1).','De groene stippellijn laat de hele grafiek zien.','Rode punten liggen niet op de grafiek.'],
+     praise:['Alle punten liggen op de lijn van y = -x + 3.']},
+    {type:'mc',cfg:Object.assign({},G,{lines:[{f:x=>x-2,kl:'roze',naam:'grafiek'}]}),noLegend:true,
+     text:['Welke formule hoort bij deze grafiek?'],opts:['y = x + 2','y = x - 2','y = 2x'],ans:1,
+     hints:['Kijk waar de lijn de y-as raakt. Daar is x = 0.','Vul x = 0 in bij elke formule.','Welke formule geeft dezelfde y?'],
+     explain:['De lijn raakt de y-as bij -2.','Bij x = 0 geeft y = x - 2: 0 - 2 = -2.','Bij x = 2 geeft y = x - 2: 2 - 2 = 0. Dat klopt ook!'],guides:[{x:0,y:-2},{x:2,y:0}]},
+    {type:'plotLine',cfg:VRIES,f:x=>4-2*x,min:3,
+     context:['Je zet een flesje water in de vriezer.','Het water is 4 graden.','Elk uur wordt het 2 graden kouder.'],
+     text:['De formule is: temperatuur = 4 - 2 × uur.','Teken minstens 3 punten van de grafiek.'],
+     hints:['Begin bij 0 uur. Dan is de temperatuur 4 graden.','Na 1 uur: 4 - 2 × 1. Reken dit uit.','Na 3 uur: 4 - 2 × 3. Let op: de uitkomst is onder nul.'],
+     explain:['0 uur → 4 - 0 = 4. Punt (0, 4).','1 uur → 4 - 2 = 2. Punt (1, 2).','3 uur → 4 - 6 = -2. Punt (3, -2).','De groene stippellijn laat de hele grafiek zien.'],
+     praise:['Na 2 uur is het 0 graden: het water gaat bevriezen!']}
+  ],
+  toets:[
+    {type:'num',text:['Bekijk de formule y = 3x + 1.','Wat is y als x = 2?'],ans:7,
+     hints:['3x betekent: 3 keer x.','Reken eerst 3 × 2 uit.','Tel daar 1 bij op.'],
+     explain:['3 × 2 = 6.','6 + 1 = 7.','Dus y = 7.']},
+    {type:'num',text:['Bekijk de formule y = x - 5.','Wat is y als x = -1?'],ans:-6,
+     hints:['Vervang x door -1.','Je rekent: -1 - 5.','Start op de getallenlijn bij -1. Ga 5 stappen naar links.'],
+     explain:['-1 - 5 = -6.','Dus y = -6.']},
+    T('y = -x + 2', x=>-x+2, [-2,-1,0,1,2], x=>`-(${x}) + 2 = ${-x+2}`, '-x betekent: het tegenovergestelde van x. Is x = -2? Dan is -x = 2.'),
+    {type:'plotLine',cfg:G,f:x=>x-3,min:3,
+     text:['Bekijk de formule y = x - 3.','Teken minstens 3 punten die op de grafiek liggen.'],
+     hints:['Maak eerst een kleine tabel.','Kies bijvoorbeeld x = 0, x = 1 en x = 2.','Bij x = 0 reken je: y = 0 - 3.'],
+     explain:['x = 0 → y = -3. Punt (0, -3).','x = 1 → y = -2. Punt (1, -2).','x = 2 → y = -1. Punt (2, -1).','De groene stippellijn laat de hele grafiek zien.']},
+    {type:'mc',text:['Bekijk de formule y = 2x + 1.','Welk punt ligt op de grafiek?'],opts:['(1, 3)','(2, 4)','(0, 2)','(-1, 1)'],ans:0,
+     hints:['Een punt is (x, y).','Vul de x van het punt in de formule in.','Is de y die je uitrekent gelijk aan de y van het punt?'],
+     explain:['Bij (1, 3): 2 × 1 + 1 = 3. Dat klopt!','Bij (2, 4): 2 × 2 + 1 = 5. Dat is geen 4.','Bij (0, 2): 2 × 0 + 1 = 1. Dat is geen 2.','Bij (-1, 1): 2 × -1 + 1 = -1. Dat is geen 1.']}
+  ]
+},
+/* ---------- MODULE 4: 2.1 GRAFIEKEN (STEIL EN VLAK) ---------- */
+{
+  kort:"2.1 Steil en vlak", et:ET.d,
+  uitleg:{
+    titel:"Steil of minder steil",
+    lines:['Een grafiek stijgt of daalt niet altijd even snel.','Soms is het ene stuk van de grafiek steiler dan een ander stuk.','Steil betekent: de lijn gaat snel omhoog of snel omlaag.','Steil omhoog = snel meer.','Steil omlaag = snel minder.','Een plat stuk betekent: er verandert niets.'],
+    ezel:'Steil als een berg = snel. Plat als een weg = er verandert niets.',
+    graph:{cfg:WINST, ex:{}},
+    caption:['Vraag: in welke periode groeit de winst het snelst?','Van 6 tot 7 jaar is de grafiek steiler dan in de jaren daarna.','De winst groeit het snelst van 6 tot 7 jaar.'],
+    waarom:['Een weerman ziet zo hoe snel het kouder wordt.','Een bedrijf ziet zo wanneer de winst het snelst groeit.','Een duikinstructeur let op hoe snel iemand naar boven zwemt.']
+  },
+  opdr:[
+    {type:'mc',cfg:TEMP21,context:TEMP21_CTX,text:['Hoort deze grafiek bij een winterdag of bij een zomerdag?'],opts:['Een winterdag','Een zomerdag'],ans:0,
+     hints:['Kijk naar de getallen op de verticale as.','Hoe warm wordt het op deze dag?','Het wordt nooit warmer dan 6 graden. Past dat bij de zomer?'],
+     explain:['De temperatuur blijft rond het vriespunt (0 graden).','Het wordt hoogstens 6 graden.','Dat past bij een winterdag.']},
+    {type:'num',cfg:TEMP21,context:TEMP21_CTX,text:['Lees af.','Hoeveel graden steeg de temperatuur tussen 14:00 uur en 17:45 uur?'],ans:4,unit:'graden',
+     hints:['Lees de temperatuur af om 14:00 uur.','Lees de temperatuur af om 17:45 uur.','Hoeveel hokjes ga je omhoog van het eerste naar het tweede getal?'],
+     explain:['Om 14:00 uur is het -3 graden.','Om 17:45 uur is het 1 graad.','Van -3 naar 1 is 4 stappen omhoog.','De temperatuur steeg 4 graden.'],
+     guides:[{x:14,y:-3,t:'14:00 → -3'},{x:17.75,y:1,t:'17:45 → 1'}]},
+    {type:'color',cfg:TEMP21,context:TEMP21_CTX,segs:TEMP21_SEGS,target:[1,4],kleur:'blauw',
+     text:['Op welke stukken van de grafiek gaat de temperatuur niet omhoog en niet omlaag?','Kleur die stukken blauw.'],
+     hints:['Niet omhoog en niet omlaag betekent: de temperatuur blijft gelijk.','Zoek de stukken waar de lijn plat (horizontaal) is.','Er zijn 2 van zulke stukken.'],
+     explain:['De temperatuur blijft gelijk van 10:00 tot 11:45 uur.','En van ongeveer 17:15 tot 19:00 uur.','Daar is de lijn plat.','De groene stippellijn laat zien welke stukken blauw moeten.']},
+    {type:'mc',cfg:TEMP21,context:TEMP21_CTX,text:['Op welke drie tijden was het precies 0 graden?'],opts:['7:00, 13:00 en 16:15 uur','7:00, 12:00 en 17:00 uur','10:00, 14:00 en 17:15 uur'],ans:0,
+     hints:['0 graden is de horizontale as.','Zoek waar de grafiek de horizontale as raakt of kruist.','Lees bij elk punt de tijd af.'],
+     explain:['De grafiek raakt de horizontale as 3 keer.','Om 7:00 uur, om 13:00 uur en om 16:15 uur.'],
+     guides:[{x:7,y:0,t:'7:00'},{x:13,y:0,t:'13:00'},{x:16.25,y:0,t:'16:15',dy:30}]},
+    {type:'mc',cfg:TEMP21,context:TEMP21_CTX,text:['Midden op de dag begon het te ijzelen.','De temperatuur daalde toen snel.','Hoe laat ongeveer begon het te ijzelen?'],opts:['10:00 uur','12:00 uur','14:00 uur'],ans:1,
+     hints:['Bij ijzel wordt het snel kouder.','Zoek waar de grafiek snel gaat dalen.','Lees de tijd af waar het dalen begint.'],
+     explain:['Rond 12:00 uur gaat de grafiek steil omlaag.','Daar begon het te ijzelen.'],
+     guides:[{x:12,y:5.6,t:'12:00'}]},
+    {type:'mc',cfg:TEMP21,context:TEMP21_CTX,text:['Wanneer steeg de temperatuur het snelst?'],opts:['Van 7:00 tot 9:30 uur','Van 14:00 tot 16:30 uur'],ans:0,
+     hints:['Snel stijgen betekent: een steile lijn omhoog.','Vergelijk de twee stukken van de grafiek.','Welk stuk gaat het steilst omhoog?'],
+     explain:['Van 7:00 tot 9:30 uur stijgt de temperatuur van 0 naar ongeveer 5,5 graden.','Van 14:00 tot 16:30 uur stijgt de temperatuur van -3 naar ongeveer 0 graden.','Van 7:00 tot 9:30 uur is de grafiek steiler.','Daar steeg de temperatuur het snelst.'],
+     guides:[{x:7,y:0,t:'7:00'},{x:9.5,y:5.5,t:'9:30'},{x:14,y:-3,t:'14:00'},{x:16.5,y:0.4,t:'16:30'}]},
+    {type:'mc',cfg:WINST,context:WINST_CTX,text:['Tussen welke jaren neemt de winst af?'],opts:['Tussen 0 en 4 jaar','Tussen 4 en 6 jaar','Tussen 6 en 10 jaar'],ans:0,
+     hints:['Afnemen betekent: minder worden.','Zoek waar de grafiek omlaag gaat.','Kijk van links naar rechts.'],
+     explain:['Van 0 tot 4 jaar gaat de grafiek omlaag.','Van 4 tot 6 jaar is de lijn plat.','Na 6 jaar gaat de lijn omhoog.'],
+     guides:[{x:0,y:280},{x:4,y:80}]},
+    {type:'color',cfg:WINST,context:WINST_CTX,segs:WINST_SEGS,target:[1],kleur:'blauw',
+     text:['Kleur het deel van de grafiek waar de winst het snelst daalde blauw.'],
+     hints:['Snel dalen betekent: een steile lijn omlaag.','Er zijn twee stukken die omlaag gaan.','Welk van die twee stukken is het steilst?'],
+     explain:['Van 2 tot 4 jaar daalt de winst van 240 naar 80 miljoen.','Dat is het steilste stuk omlaag.','De groene stippellijn laat zien welk stuk blauw moet.']},
+    {type:'mc',cfg:WINST,context:WINST_CTX,text:['In welke twee jaren daalde de winst het snelst?'],opts:['Tussen 0 en 2 jaar','Tussen 2 en 4 jaar'],ans:1,
+     hints:['Lees af hoeveel de winst daalt van 0 tot 2 jaar.','Lees af hoeveel de winst daalt van 2 tot 4 jaar.','Bij welk stuk is de daling het grootst?'],
+     explain:['Van 0 tot 2 jaar: van 280 naar 240. Dat is 40 miljoen minder.','Van 2 tot 4 jaar: van 240 naar 80. Dat is 160 miljoen minder.','Tussen 2 en 4 jaar daalde de winst het snelst.'],
+     guides:[{x:0,y:280},{x:2,y:240},{x:4,y:80}]},
+    {type:'plot',cfg:CARLA,context:CARLA_CTX,tabRows:CARLA_TAB,et:ET.teken,joinPts:true,joinKl:'roze',
+     targets:CARLA_P.map(p=>({x:p[0],y:p[1]})),
+     text:['Teken in het assenstelsel de grafiek bij de tabel.','Klik elk punt uit de tabel aan.'],
+     hints:['Op de horizontale as is de stapgrootte 5 minuten. Elk hokje is 5 minuten.','Op de verticale as is de stapgrootte 5 meter. Onder de 0 is het min.','Het tweede punt is (5, -20): na 5 minuten is Carla 20 meter diep.'],
+     explain:['De punten zijn: (0, 0), (5, -20), (10, -30), (15, -30), (20, -15), (25, -5) en (30, 0).','De groene rondjes laten zien waar ze moeten staan.','Rode punten staan op de verkeerde plek. Klik erop om ze weg te halen.'],
+     praise:['Je ziet nu de hele duik van Carla.']}
+  ],
+  toets:[
+    {type:'num',cfg:CARLA_L,context:CARLA_CTX,text:['Hoelang duurt het voor Carla om van het diepste punt weer bij het wateroppervlak te komen?'],ans:15,unit:'minuten',
+     hints:['Het diepste punt is het laagste punt van de grafiek.','Het wateroppervlak is 0 meter.','Wanneer gaat Carla weg van het diepste punt? En wanneer is ze weer bij 0?'],
+     explain:['Carla is tot 15 minuten op het diepste punt (-30 meter).','Na 30 minuten is ze weer bij 0 meter.','30 - 15 = 15 minuten.'],
+     guides:[{x:15,y:-30},{x:30,y:0}]},
+    {type:'color',cfg:CARLA_L,context:CARLA_CTX,segs:CARLA_SEGS,target:[0],kleur:'rood',
+     text:['Kleur het deel van de grafiek waarbij Carla het snelst afdaalde rood.'],
+     hints:['Afdalen betekent: dieper gaan. De grafiek gaat dan omlaag.','Snel afdalen betekent: een steile lijn omlaag.','Vergelijk de stukken van 0 tot 5 en van 5 tot 10 minuten.'],
+     explain:['Van 0 tot 5 minuten gaat Carla 20 meter omlaag.','Van 5 tot 10 minuten gaat ze maar 10 meter omlaag.','Het eerste stuk is het steilst.']},
+    {type:'num',cfg:JOLANDA,context:JOL_CTX,tabRows:JOL_TAB,text:['Welke stapgrootte heeft Jolanda op de verticale as gebruikt?'],ans:50,unit:'euro',
+     hints:['De verticale as is de as die omhoog gaat.','Stapgrootte betekent: hoeveel komt er bij per hokje?','Kijk naar twee getallen naast elkaar, bijvoorbeeld 200 en 250.'],
+     explain:['Op de verticale as staan 200, 250, 300, 350 ...','Elke stap is 50 euro.','Onderaan zie je een zaagtand.','Zo hoeft Jolanda niet bij 0 te beginnen. Anders krijg je een groot leeg stuk.']},
+    {type:'mc',cfg:JOLANDA,context:JOL_CTX,text:['In welke periode daalt het bedrag het snelst?'],opts:['Tussen dag 0 en dag 1','Tussen dag 1 en dag 2'],ans:1,
+     hints:['Snel dalen betekent: een steile lijn omlaag.','Lees af hoeveel euro eraf gaat van dag 0 naar dag 1.','Lees af hoeveel euro eraf gaat van dag 1 naar dag 2.'],
+     explain:['Van dag 0 naar dag 1: van 500 naar 460. Dat is 40 euro minder.','Van dag 1 naar dag 2: van 460 naar 250. Dat is 210 euro minder.','Tussen dag 1 en dag 2 is de grafiek het steilst.'],
+     guides:[{x:0,y:500},{x:1,y:460},{x:2,y:250}]},
+    {type:'mc',cfg:INGRID,context:['De grafiek hoort bij een wandeltocht van Ingrid.'],text:['In welke periode loopt Ingrid het langzaamst?'],opts:['Tussen 4 en 7 kwartier','Tussen 7 en 9,5 kwartier'],ans:0,
+     hints:['Langzaam lopen betekent: er komen weinig kilometers bij.','Een lijn die minder steil is, hoort bij langzaam lopen.','Vergelijk de twee stukken.'],
+     explain:['Van 4 tot 7 kwartier loopt ze van 8 naar 10,5 km. Dat is 2,5 km.','Van 7 tot 9,5 kwartier loopt ze van 10,5 naar 14 km. Dat is 3,5 km.','Tussen 4 en 7 kwartier is de grafiek minder steil.','Daar loopt Ingrid het langzaamst.'],
+     guides:[{x:4,y:8},{x:7,y:10.5},{x:9.5,y:14}]},
+    {type:'num',cfg:DOLFIJN,context:['In de grafiek zie je hoe diep een dolfijn zwemt en hoe hoog hij springt.','0 meter is het wateroppervlak.'],text:['Hoe hoog springt de dolfijn?'],ans:6,unit:'meter',
+     hints:['De sprong is het hoogste punt van de grafiek.','Ga vanaf het hoogste punt naar links naar de verticale as.','Op de verticale as is de stapgrootte 4 meter. Het hoogste punt ligt precies tussen 4 en 8.'],
+     explain:['Het hoogste punt is na 15 seconden.','Het ligt precies tussen 4 en 8.','De dolfijn springt 6 meter hoog.'],
+     guides:[{x:15,y:6}]}
+  ]
+},
+/* ---------- MODULE 5: 2.2 GRAFIEKEN VERGELIJKEN ---------- */
+{
+  kort:"2.2 Grafieken vergelijken", et:ET.e,
+  uitleg:{
+    titel:"Grafieken vergelijken",
+    lines:['Grafieken kun je goed vergelijken als ze in één assenstelsel staan.','Kijk welke grafiek hoger ligt.','Hoger betekent hier: verder gefietst.','Waar de grafieken elkaar raken, zijn ze op hetzelfde punt.'],
+    ezel:'Wie het hoogst ligt, is voorop!',
+    graph:{cfg:JANALEX, ex:{vdash:[{x:15,y:10},{x:45,y:25},{x:60,y:33}],notes:[{x:15,y:10,t:'Alex voorop',dx:4,dy:-22,a:'middle'},{x:45,y:25,t:'op hetzelfde punt',dx:8,dy:24,a:'start'},{x:60,y:33,t:'Jan voorop',dx:-12,dy:-6,a:'end'}]}},
+    caption:['Vraag: wie fietste na 15 minuten voorop?','Na 15 minuten ligt de grafiek van Alex boven die van Jan.','Alex fietste dus voorop.'],
+    waarom:['Een planner vergelijkt zo hoe snel een bus en een auto zijn.','Een sportcoach vergelijkt zo twee hardlopers.','Een arts vergelijkt zo hoe kinderen groeien.']
+  },
+  opdr:[
+    {type:'mc',cfg:FLIX1,cfg2:FLIX2,context:FLIX_CTX,text:['Welke grafiek hoort bij Wout?'],opts:['Grafiek 1','Grafiek 2'],ans:1,
+     hints:['Wout zit in de bus.','De bus stopt twee keer. Stoppen zie je als een plat stuk.','Bij welke grafiek zie je twee platte stukken?'],
+     explain:['Grafiek 2 heeft twee platte stukken.','Daar staat de bus stil.','Grafiek 2 hoort bij Wout. Grafiek 1 hoort bij Ria.']},
+    {type:'num',cfg:FLIX1,cfg2:FLIX2,context:FLIX_CTX,text:['Hoe groot is de afstand van Amsterdam naar Parijs?'],ans:500,unit:'km',
+     hints:['Kijk naar het einde van de grafieken.','Daar zijn ze in Parijs.','Lees af op de verticale as.'],
+     explain:['Beide grafieken eindigen bij 500.','De afstand is 500 km.']},
+    {type:'mc',cfg:FLIX2,context:FLIX_CTX,text:['Hier zie je alleen grafiek 2 van de Flixbus.','Hoe laat vertrok de Flixbus?'],opts:['6:00 uur','7:00 uur','8:00 uur'],ans:0,
+     hints:['Vertrekken betekent: de afstand is nog 0 km.','Zoek waar de grafiek begint.','Lees de tijd af op de horizontale as.'],
+     explain:['De grafiek van de bus begint bij 6:00 uur.','De Flixbus vertrok om 6:00 uur.'],
+     guides:[{x:6,y:0,t:'6:00'}]},
+    {type:'num',cfg:FLIX1,context:FLIX_CTX,text:['Hier zie je alleen grafiek 1 van Ria.','Hoe vaak stopte Ria onderweg?'],ans:1,unit:'keer',
+     hints:['Stoppen betekent: de afstand blijft gelijk.','Dan zie je een plat stuk in de grafiek.','Tel de platte stukken.'],
+     explain:['In grafiek 1 is er één plat stuk.','Ria stopte één keer.'],
+     guides:[{x:10.25,y:330,t:'stop'}]},
+    {type:'mc',cfg:FLIXB,context:FLIX_CTX.concat(['Nu staan beide grafieken in één assenstelsel.']),text:['Hoe laat ongeveer haalde Ria de bus in?'],opts:['Rond 8:30 uur','Rond 9:30 uur','Rond 11:00 uur'],ans:1,
+     hints:['Inhalen betekent: Ria komt naast de bus.','Zoek waar de grafieken elkaar raken.','Lees de tijd af op de horizontale as.'],
+     explain:['Rond 9:30 uur raken de grafieken elkaar.','Daarna ligt de grafiek van Ria boven die van de bus.','Ria haalde de bus rond half 10 in.'],
+     guides:[{x:9.5,y:250,t:'9:30'}]},
+    {type:'mc',cfg:FLIXB,context:FLIX_CTX,text:['Wie kwam als eerste aan in Parijs?'],opts:['Wout (bus)','Ria (auto)'],ans:1,
+     hints:['Parijs is bij 500 km.','Zoek wie het eerst bij 500 km is.','Eerder betekent: meer naar links.'],
+     explain:['Ria is om 12:00 uur bij 500 km.','De bus is pas om 13:00 uur bij 500 km.','Ria was er het eerst.'],
+     guides:[{x:12,y:500,t:'12:00'},{x:13,y:500,t:'13:00',dy:32}]},
+    {type:'mc',cfg:JANALEX,context:JANALEX_CTX,text:['Wie fietste na 60 minuten voorop?'],opts:['Jan','Alex'],ans:0,
+     hints:['Zoek op de horizontale as 60 minuten.','Welke grafiek ligt daar het hoogst?','Hoger betekent: verder gefietst.'],
+     explain:['Na 60 minuten ligt de grafiek van Jan boven die van Alex.','Jan heeft dan meer kilometers gefietst.','Jan fietste voorop.'],
+     guides:[{x:60,y:33},{x:60,y:27}]},
+    {type:'num',cfg:JANALEX,context:JANALEX_CTX,text:['Na hoeveel minuten hadden Jan en Alex evenveel kilometers afgelegd?'],ans:45,unit:'minuten',
+     hints:['Evenveel kilometers betekent: de grafieken raken elkaar.','Zoek het punt waar de grafieken elkaar kruisen.','Ga vanaf dat punt recht omlaag naar de horizontale as.'],
+     explain:['De grafieken kruisen elkaar na 45 minuten.','Ze hebben dan allebei 25 km gefietst.'],
+     guides:[{x:45,y:25}]},
+    {type:'mc',cfg:GERRINA,context:GERRINA_CTX,text:['Hoort grafiek A bij Ger of bij Rina?'],opts:['Ger (fiets)','Rina (bus)'],ans:0,
+     hints:['Een bus stopt bij haltes.','Bij een halte zie je een plat stuk in de grafiek.','Welke grafiek heeft platte stukken? Die hoort bij de bus.'],
+     explain:['Grafiek B heeft platte stukken. Daar stopt de bus bij een halte.','Grafiek B hoort bij Rina.','Grafiek A hoort bij Ger.']},
+    {type:'plot',cfg:LENGTE,context:LENGTE_CTX.concat(['De grafiek van Noortje is al getekend.','De lengte van Bram staat in de tabel.']),et:ET.teken,
+     tabRows:{lx:'leeftijd in jaren',ly:'lengte in centimeters',xs:BRAM_P.map(p=>p[0]),ys:BRAM_P.map(p=>p[1])},
+     targets:BRAM_P.map(p=>({x:p[0],y:p[1]})),tol:2,joinPts:true,joinKl:'blauw',
+     text:['Teken in hetzelfde assenstelsel de grafiek van Bram.','Klik elk punt uit de tabel aan.'],
+     hints:['Op de horizontale as is elk hokje 1 jaar.','Op de verticale as is elk hokje 10 centimeter.','136 ligt iets boven het midden tussen 130 en 140.'],
+     explain:['De punten zijn: (0, 50), (2, 80), (4, 100), (6, 120), (8, 136), (10, 150) en (12, 163).','De groene rondjes laten zien waar ze moeten staan.','Je mag er 1 of 2 centimeter naast zitten.'],
+     praise:['De blauwe lijn is de grafiek van Bram.']}
+  ],
+  toets:[
+    {type:'mc',cfg:GERRINA,context:GERRINA_CTX,text:['Hoe laat vertrok de bus?'],opts:['8:00 uur','8:04 uur','8:08 uur'],ans:1,
+     hints:['De bus hoort bij grafiek B.','Vertrekken betekent: de afstand is nog 0 km.','Waar begint grafiek B?'],
+     explain:['Grafiek B begint bij 8:04 uur.','De bus vertrok om 8:04 uur.'],
+     guides:[{x:4,y:0,t:'8:04'}]},
+    {type:'mc',cfg:GERRINA,context:GERRINA_CTX,text:['Hoe laat haalde de bus de fiets in?'],opts:['8:04 uur','8:08 uur','8:12 uur'],ans:1,
+     hints:['Inhalen betekent: de bus komt naast de fiets.','Zoek waar grafiek A en grafiek B elkaar kruisen.','Ga vanaf dat punt omlaag naar de tijd.'],
+     explain:['De grafieken kruisen elkaar om 8:08 uur.','Daarna ligt grafiek B (de bus) boven grafiek A (de fiets).'],
+     guides:[{x:8,y:1.5,t:'8:08'}]},
+    {type:'mc',cfg:LENGTE2,context:LENGTE_CTX,text:['Wie groeide de eerste twee jaar het snelst?'],opts:['Noortje','Bram'],ans:0,
+     hints:['Kijk naar het stuk van 0 tot 2 jaar.','Snel groeien betekent: een steile lijn.','Welke grafiek is daar het steilst?'],
+     explain:['Van 0 tot 2 jaar is de grafiek van Noortje steiler dan die van Bram.','Steiler betekent: sneller groeien.','Noortje groeide de eerste twee jaar het snelst.']},
+    {type:'num',cfg:LENGTE2,context:LENGTE_CTX,text:['Op welke leeftijd waren Noortje en Bram even lang?'],ans:6,unit:'jaar',
+     hints:['Even lang betekent: de grafieken raken elkaar.','Zoek het punt waar de lijnen elkaar kruisen.','Ga recht omlaag naar de horizontale as.'],
+     explain:['De grafieken kruisen elkaar bij 6 jaar.','Ze waren toen allebei 120 cm.'],
+     guides:[{x:6,y:120}]},
+    {type:'num',cfg:FRANZWIM,context:['Franz (F) en Wim (W) beginnen tegelijk aan dezelfde wandeltocht.','In het assenstelsel zie je hun grafieken.'],text:['Wim loopt eerst voorop.','Wim loopt voorop tussen 0 kwartier en hoeveel kwartier?'],ans:2,unit:'kwartier',
+     hints:['Voorop lopen betekent: de grafiek ligt hoger.','Zoek waar de grafiek van Wim (W) boven die van Franz (F) ligt.','Waar raken de grafieken elkaar voor het eerst?'],
+     explain:['De grafiek van Wim ligt eerst boven die van Franz.','Bij 2 kwartier raken de grafieken elkaar.','Wim loopt voorop tussen 0 en 2 kwartier.','Daarna loopt Franz voorop. Franz komt ook het eerst aan.'],
+     guides:[{x:2,y:3}]}
+  ]
+},
+/* ---------- MODULE 6: 2.3 AFLEZEN EN CONTROLEREN ---------- */
+{
+  kort:"2.3 Aflezen en controleren", et:ET.f,
+  uitleg:{
+    titel:"Aflezen en controleren",
+    lines:['Lees een grafiek zo precies mogelijk af.','Daarna controleer je je antwoord met de formule.','Vul het getal dat je hebt afgelezen in de formule in.','Komt er hetzelfde uit? Dan klopt je antwoord.'],
+    ezel:'Eerst aflezen, dan controleren!',
+    graph:{cfg:VB25, ex:{guides:[{x:3,y:75,t:'75 euro → 3 weken'}]}},
+    caption:['De grafiek hoort bij de formule: tijd × 25 = bedrag.','Vraag: welk aantal weken hoort bij 75 euro?','Aflezen: ga bij 75 naar rechts tot de lijn. Ga dan omlaag. Je komt uit bij 3 weken.','Controleren: 3 × 25 = 75. Klopt!'],
+    waarom:['Zo weet je hoelang je moet sparen voor iets nieuws.','Een monteur rekent zo een rekening na.','Zo maak je minder fouten met geld.']
+  },
+  opdr:[
+    {type:'num',cfg:JOHN,context:['John spaart elke week € 7,50.','De grafiek hoort hierbij.'],text:['Lees uit de grafiek af hoeveel weken John moet sparen voor € 300.'],ans:40,unit:'weken',
+     hints:['Zoek 300 op de verticale as.','Ga naar rechts tot je de lijn raakt.','Ga dan recht omlaag naar de horizontale as.'],
+     explain:['Ga bij 300 euro naar rechts naar de lijn.','Ga dan omlaag.','Je komt uit bij 40 weken.'],
+     guides:[{x:40,y:300}]},
+    {type:'num',cfg:JOHN,context:['John spaart elke week € 7,50.','Je hebt afgelezen: 40 weken.'],text:['Controleer met een berekening.','Reken uit: 40 × € 7,50.','Hoeveel euro komt eruit?'],ans:300,unit:'euro',
+     hints:['€ 7,50 is 7 euro en 50 cent.','40 × 7 = 280 en 40 × 0,50 = 20.','Tel die twee bedragen bij elkaar op.'],
+     explain:['40 × 7 = 280.','40 × 0,50 = 20.','280 + 20 = 300.','Er komt € 300 uit. Je antwoord klopt!']},
+    {type:'num',cfg:JOHN,context:['John spaart elke week € 7,50.'],text:['Lees uit de grafiek af hoeveel weken bij € 150 hoort.'],ans:20,unit:'weken',
+     hints:['Zoek 150 op de verticale as. Het ligt tussen 100 en 200.','Ga naar rechts tot je de lijn raakt.','Ga dan recht omlaag.'],
+     explain:['Bij 150 euro hoort 20 weken.','Controle: 20 × 7,50 = 150. Klopt!'],
+     guides:[{x:20,y:150}]},
+    {type:'num',cfg:VB25,context:['De grafiek hoort bij de formule: tijd × 25 = bedrag.'],text:['Bij hoeveel weken hoort een bedrag van € 150?'],ans:6,unit:'weken',
+     hints:['Zoek 150 op de verticale as.','Ga naar rechts tot je de lijn raakt.','Ga dan recht omlaag naar de horizontale as.'],
+     explain:['Bij 150 euro hoort 6 weken.'],
+     guides:[{x:6,y:150}]},
+    {type:'num',context:['De formule is: tijd × 25 = bedrag.','Je hebt afgelezen: bij € 150 hoort 6 weken.'],text:['Controleer je antwoord met de formule.','Reken uit: 6 × 25.'],ans:150,unit:'euro',
+     hints:['2 × 25 = 50.','6 weken is 3 keer zoveel als 2 weken.','Reken: 50 + 50 + 50.'],
+     explain:['6 × 25 = 150.','Er komt € 150 uit.','Je antwoord klopt!']},
+    {type:'plot',cfg:PAT,context:['Pat gaat kamperen.','Bij zijn kosten hoort de formule: aantal dagen × 8 + 16 = kosten.','De grafiek hoort bij deze formule.'],
+     targets:[{x:3,y:40}],
+     text:['Teken het punt op de grafiek dat hoort bij € 40.'],
+     hints:['Zoek 40 op de verticale as.','Ga naar rechts tot je de lijn raakt.','Klik op dat punt van de lijn.'],
+     explain:['Ga bij 40 euro naar rechts naar de lijn.','Daar ligt het punt.','Het punt ligt boven 3 dagen: (3, 40).']},
+    {type:'num',context:['Pat gaat kamperen.','Bij zijn kosten hoort de formule: aantal dagen × 8 + 16 = kosten.','Je hebt afgelezen: bij € 40 hoort 3 dagen.'],text:['Vul 3 dagen in de formule in.','Reken uit: 3 × 8 + 16.'],ans:40,unit:'euro',
+     hints:['Reken eerst 3 × 8 uit.','3 × 8 = 24.','Tel daar 16 bij op.'],
+     explain:['3 × 8 = 24.','24 + 16 = 40.','Er komt € 40 uit. Het klopt!']},
+    {type:'num',cfg:PAT,context:['Pat gaat kamperen.','Bij zijn kosten hoort de formule: aantal dagen × 8 + 16 = kosten.'],text:['Lees af hoeveel dagen Pat kan kamperen voor € 64.'],ans:6,unit:'dagen',
+     hints:['Zoek 64 op de verticale as.','Ga naar rechts tot je de lijn raakt.','Ga dan recht omlaag.'],
+     explain:['Bij 64 euro hoort 6 dagen.','Controle: 6 × 8 + 16 = 48 + 16 = 64. Klopt!'],
+     guides:[{x:6,y:64}]},
+    T('tijd × 10 + 20 = bedrag', x=>10*x+20, [0,2,4,6,8,10], x=>`${x} × 10 + 20 = ${10*x+20}`, 'Bij tijd = 2 reken je: 2 × 10 = 20. Daarna 20 + 20.',
+      {lx:'tijd in uren',ly:"bedrag in euro's",et:ET.tabel,context:['Daan rekent met de formule: tijd × 10 + 20 = bedrag.'],
+       text:['Vul de tabel in bij de formule.','Reken bij elke tijd het bedrag uit.'],
+       explain:['Vul elke tijd in de formule in.'].concat([0,2,4,6,8,10].map(x=>`${x} uur: ${x} × 10 + 20 = ${10*x+20} euro`))}),
+    {type:'plot',cfg:UUR13,context:['Daan rekent met de formule: tijd × 10 + 20 = bedrag.','Dit is de tabel bij de formule.'],et:ET.teken,
+     tabel:{xs:[0,2,4,6,8,10],f:x=>10*x+20,lx:'tijd in uren',ly:"bedrag in euro's"},
+     targets:[0,2,4,6,8,10].map(x=>({x,y:10*x+20})),f:x=>10*x+20,
+     text:['Teken de grafiek in het assenstelsel.','Klik alle punten uit de tabel aan.'],
+     hints:['Het eerste punt is (0, 20).','Op de verticale as is elk hokje 10 euro.','Je moet 6 punten tekenen.'],
+     explain:['De punten zijn: (0, 20), (2, 40), (4, 60), (6, 80), (8, 100) en (10, 120).','De groene rondjes laten zien waar ze moeten staan.'],
+     praise:['Zie je? Alle punten liggen op één rechte lijn.']}
+  ],
+  toets:[
+    {type:'num',cfg:UUR13L,context:['Daan rekent met de formule: tijd × 10 + 20 = bedrag.'],text:['Lees af bij welk aantal uur het bedrag € 70 is.'],ans:5,unit:'uur',
+     hints:['Zoek 70 op de verticale as. Het ligt tussen 60 en 80.','Ga naar rechts tot je de lijn raakt.','Ga dan recht omlaag.'],
+     explain:['Bij 70 euro hoort 5 uur.','Controle: 5 × 10 + 20 = 50 + 20 = 70. Klopt!'],
+     guides:[{x:5,y:70}]},
+    {type:'num',cfg:UUR13L,context:['Daan rekent met de formule: tijd × 10 + 20 = bedrag.','Bij € 90 hoort 7 uur.'],text:['Controleer dit met de formule.','Reken uit: 7 × 10 + 20.'],ans:90,unit:'euro',
+     hints:['Reken eerst 7 × 10.','7 × 10 = 70.','Tel daar 20 bij op.'],
+     explain:['7 × 10 = 70.','70 + 20 = 90.','Het klopt!'],
+     guides:[{x:7,y:90}]},
+    T('aantal trainingen × 2 + 30 = kosten', x=>2*x+30, [0,10,20,30,40,50], x=>`${x} × 2 + 30 = ${2*x+30}`, 'Bij 10 trainingen: 10 × 2 = 20. Daarna 20 + 30.',
+      {lx:'aantal trainingen',ly:"kosten in euro's",et:ET.tabel,context:['David is lid van een sportvereniging.','Hij berekent zijn kosten met de formule: aantal trainingen × 2 + 30 = kosten.'],
+       text:['Vul de tabel in bij de formule.','Reken bij elk aantal trainingen de kosten uit.'],
+       explain:['Vul elk aantal trainingen in de formule in.'].concat([0,10,20,30,40,50].map(x=>`${x} trainingen: ${x} × 2 + 30 = ${2*x+30} euro`))}),
+    {type:'num',cfg:DAVID,context:['David berekent zijn kosten met de formule: aantal trainingen × 2 + 30 = kosten.'],text:['In een maand gaf David € 60 uit.','Hoeveel keer heeft hij die maand getraind?'],ans:15,unit:'keer',
+     hints:['Zoek 60 op de verticale as.','Ga naar rechts tot de lijn en dan omlaag.','Op de horizontale as is elk hokje 5 trainingen.'],
+     explain:['Bij 60 euro hoort 15 trainingen.','Controle: 15 × 2 + 30 = 30 + 30 = 60. Klopt!'],
+     guides:[{x:15,y:60}]},
+    {type:'num',cfg:LD23,context:['De grafiek hoort bij de formule: aantal uur × 4 + 12 = bedrag.'],text:['Welk aantal uur hoort bij een bedrag van € 28?','Vergeet de controle niet.'],ans:4,unit:'uur',
+     hints:['Zoek 28 op de verticale as.','Ga naar rechts tot de lijn en dan omlaag.','Controleer: vul je antwoord in de formule in.'],
+     explain:['Bij 28 euro hoort 4 uur.','Controle: 4 × 4 + 12 = 16 + 12 = 28. Klopt!'],
+     guides:[{x:4,y:28}]}
+  ]
+}
+
+];
+
+/* ============ ONLINE OPSLAAN MET SUPABASE ============ */
+// Vul hier je eigen gegevens in (Supabase -> Project Settings -> API).
+// Laat je ze leeg? Dan werkt de app zonder inloggen en bewaart hij alles alleen op deze computer.
+const SUPABASE_URL = 'https://cyacjfgffxfyqknygfpm.supabase.co';   // bijvoorbeeld: 'https://abcdefghijkl.supabase.co'
+const SUPABASE_KEY = 'sb_publishable_PpC5ITnnuuC-200UnVX6gQ_3gSVGb01';   // de "anon public" key (of "publishable" key)
+const APP_ID    = 'grafieken-formules';   // vaste naam van deze app in de database
+const APP_TITEL = 'Grafieken en formules';
+const ONLINE = !!(SUPABASE_URL && SUPABASE_KEY);
+
+/* ============ STATUS ============ */
+const OPSLAG = 'grafieken-app-v1';
+const SESSIE = OPSLAG + '-sessie';
+let S = {};
+let cur = {mod:0, sec:'uitleg', i:0};
+let LL = null;          // de leerling die is aangemeld: {klascode, naam, pin, klas}
+let LADEN = false, LOGINFOUT = '';
+let wolk = {status:'', vies:false, timer:null, bezig:false, opnieuw:null};
+
+function lokaalSleutel(){ return LL ? OPSLAG + '|' + LL.klascode + '|' + LL.naam.toLowerCase() : OPSLAG; }
+function leesLokaal(){ try{ return JSON.parse(localStorage.getItem(lokaalSleutel())||'null'); }catch(e){ return null; } }
+function zetStaat(d){
+  S = (d && d.S) || {};
+  cur = (d && d.cur && MODS[d.cur.mod]) ? d.cur : {mod:0, sec:'uitleg', i:0};
+  if(cur.sec!=='uitleg' && cur.sec!=='result' && !qlist(cur.mod,cur.sec)[cur.i]) cur = {mod:cur.mod, sec:'uitleg', i:0};
+}
+if(!ONLINE) zetStaat(leesLokaal());
+
+function bewaar(){
+  try{ localStorage.setItem(lokaalSleutel(), JSON.stringify({S,cur,t:Date.now()})); }catch(e){}
+  if(ONLINE && LL){ wolk.vies = true; clearTimeout(wolk.timer); wolk.timer = setTimeout(wolkOpslaan, 1500); }
+}
+
+async function rpc(fn, body, keepalive){
+  const r = await fetch(SUPABASE_URL.replace(/\/+$/,'') + '/rest/v1/rpc/' + fn, {
+    method:'POST', keepalive:!!keepalive,
+    headers:{'Content-Type':'application/json', apikey:SUPABASE_KEY},
+    body:JSON.stringify(body)
+  });
+  if(!r.ok) throw new Error('HTTP ' + r.status);
+  return r.json();
+}
+
+// Korte samenvatting voor het docentoverzicht
+function totaalPunten(){ let t=0; for(const k in S) t+=S[k].pts||0; return t; }
+function maxPunten(){ return MODS.reduce((a,M)=>a+(M.opdr.length+M.toets.length)*2,0); }
+function samenvatting(){
+  const vragen={};
+  MODS.forEach((M,m)=>['opdr','toets'].forEach(sec=>qlist(m,sec).forEach((q,i)=>{
+    const k=key(m,sec,i), t=S[k];
+    if(t && (t.done||t.tries||t.hint||t.skipped)) vragen[k]={p:t.pts||0,f:t.tries||0,h:t.hint||0,d:t.done?1:0,o:t.skipped?1:0,z:t.shown?1:0};
+  })));
+  return {v:1, titel:APP_TITEL, modules:MODS.map(M=>({naam:M.kort, opdr:M.opdr.length, toets:M.toets.length})), vragen};
+}
+
+async function wolkOpslaan(keepalive){
+  if(!ONLINE || !LL || !wolk.vies) return;
+  if(wolk.bezig){ clearTimeout(wolk.timer); wolk.timer=setTimeout(wolkOpslaan,1000); return; }
+  wolk.bezig = true; wolk.vies = false; zetWolk('opslaan');
+  const body = {p_app:APP_ID, p_klascode:LL.klascode, p_naam:LL.naam, p_pin:LL.pin,
+    p_staat:{S,cur,t:Date.now()}, p_samenvatting:samenvatting(), p_punten:totaalPunten(), p_max:maxPunten()};
+  try{
+    const r = await rpc('leerling_opslaan', body, keepalive && JSON.stringify(body).length < 60000);
+    if(r && r.ok){ zetWolk('ok'); clearTimeout(wolk.opnieuw); }
+    else if(r && r.fout==='pincode'){ wolk.bezig=false; uitloggen(true); toast('Je pincode is veranderd door je docent. Meld je opnieuw aan.'); return; }
+    else throw new Error(r && r.fout);
+  }catch(e){
+    wolk.vies = true; zetWolk('fout');
+    clearTimeout(wolk.opnieuw); wolk.opnieuw = setTimeout(wolkOpslaan, 15000);
+  }
+  wolk.bezig = false;
+}
+function zetWolk(st){ wolk.status = st; tekenWie(); }
+function tekenWie(){
+  const el=document.getElementById('wie'); if(!el) return;
+  if(!ONLINE || !LL){ el.innerHTML=''; return; }
+  const w = {opslaan:'☁️ Opslaan…', ok:'☁️ Opgeslagen', fout:'⚠️ Nog niet opgeslagen'}[wolk.status] || '';
+  el.innerHTML = `<span class="naam">👤 ${esc(LL.naam)} · ${esc(LL.klas)}</span><span class="wolk" title="${wolk.status==='fout'?'Geen verbinding. De app probeert het steeds opnieuw.':''}">${w}</span><button onclick="uitloggen()">Uitloggen</button>`;
+}
+function toast(t){
+  const d=document.createElement('div'); d.className='toast'; d.textContent=t; document.body.appendChild(d);
+  setTimeout(()=>d.remove(), 4500);
+}
+
+async function aanmelden(klascode, naam, pin, stil){
+  klascode = String(klascode||'').replace(/\s/g,'').toUpperCase();
+  naam = String(naam||'').trim().replace(/\s+/g,' ');
+  pin = String(pin||'').trim();
+  if(!klascode){ LOGINFOUT='Vul de klascode in.'; return render(); }
+  if(naam.length<2){ LOGINFOUT='Vul je voornaam en achternaam in.'; return render(); }
+  if(!/^[0-9]{4}$/.test(pin)){ LOGINFOUT='Een pincode is 4 cijfers.'; return render(); }
+  LADEN = true; LOGINFOUT=''; render();
+  let r;
+  try{ r = await rpc('leerling_aanmelden', {p_app:APP_ID, p_klascode:klascode, p_naam:naam, p_pin:pin}); }
+  catch(e){ LADEN=false; LOGINFOUT='Er is geen verbinding. Controleer het internet en probeer het opnieuw.'; return render(); }
+  LADEN = false;
+  if(!r || !r.ok){
+    const f = r && r.fout;
+    LOGINFOUT = f==='klascode' ? 'Deze klascode bestaat niet. Vraag je docent om de goede code.'
+      : f==='pincode' ? 'De pincode klopt niet. Is dit wel jouw naam? Heeft een klasgenoot dezelfde naam? Zet dan je achternaam erbij. Pincode vergeten? Vraag je docent om hem te resetten.'
+      : f==='naam' ? 'Vul je voornaam en achternaam in.'
+      : f==='pin' ? 'Een pincode is 4 cijfers.' : 'Aanmelden lukte niet. Probeer het opnieuw.';
+    if(stil){ LOGINFOUT=''; try{ sessionStorage.removeItem(SESSIE); }catch(e){} }
+    return render();
+  }
+  LL = {klascode, naam:r.naam, pin, klas:r.klas};
+  try{ sessionStorage.setItem(SESSIE, JSON.stringify({klascode, naam, pin})); }catch(e){}
+  // Neem de nieuwste versie: van de server of van deze computer
+  const server = r.staat || {}, lokaal = leesLokaal();
+  const nieuwste = (lokaal && lokaal.S && (lokaal.t||0) > (server.t||0)) ? lokaal : server;
+  zetStaat(nieuwste);
+  wolk.status = 'ok';
+  if(nieuwste === lokaal && lokaal) wolk.vies = true;
+  render();
+  if(wolk.vies) wolkOpslaan();
+  if(!stil) toast(r.nieuw ? `Welkom, ${r.naam}! Je punten worden nu bewaard.` : `Welkom terug, ${r.naam}! Je gaat verder waar je was.`);
+}
+async function uitloggen(direct){
+  if(!direct && wolk.vies){ clearTimeout(wolk.timer); await wolkOpslaan(); }
+  if(!direct && wolk.status==='fout' && !confirm('Je laatste antwoorden zijn nog niet opgeslagen (geen internet). Toch uitloggen?')) return;
+  clearTimeout(wolk.timer); clearTimeout(wolk.opnieuw);
+  LL = null; S = {}; cur = {mod:0, sec:'uitleg', i:0}; wolk = {status:'', vies:false, timer:null, bezig:false, opnieuw:null};
+  try{ sessionStorage.removeItem(SESSIE); }catch(e){}
+  render();
+}
+function renderLogin(){
+  if(LADEN) return `<article class="card login"><h2>Even geduld…</h2><div class="lines">${lines(['Je gegevens worden geladen.'])}</div></article>`;
+  return `<article class="card login"><h2>👋 Wie ben jij?</h2>
+    <div class="lines">${lines(['Meld je aan.','Dan worden je punten bewaard.','Je kunt dan ook op een andere computer verder.'])}</div>
+    <form onsubmit="event.preventDefault();aanmelden(this.k.value,this.n.value,this.p.value)">
+      <label for="lk">Klascode</label>
+      <input id="lk" name="k" autocomplete="off" autocapitalize="characters" spellcheck="false" value="${esc(window._lk||'')}" oninput="window._lk=this.value">
+      <div class="klein">Deze code krijg je van je docent.</div>
+      <label for="ln">Je naam (voornaam en achternaam)</label>
+      <input id="ln" name="n" autocomplete="name" value="${esc(window._ln||'')}" oninput="window._ln=this.value">
+      <label for="lp">Pincode (4 cijfers)</label>
+      <input id="lp" name="p" class="pin" type="password" inputmode="numeric" maxlength="4" autocomplete="off">
+      <div class="klein lines">${lines(['Ben je nieuw? Kies dan zelf 4 cijfers.','Onthoud je pincode goed!'])}</div>
+      ${LOGINFOUT?`<div class="box bad lines">${lines([LOGINFOUT])}</div>`:''}
+      <button class="btn check" type="submit">Start ➜</button>
+    </form></article>`;
+}
+window.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden' && wolk.vies){ clearTimeout(wolk.timer); wolkOpslaan(true); } });
+window.addEventListener('pagehide',()=>{ if(wolk.vies){ clearTimeout(wolk.timer); wolkOpslaan(true); } });
+window.addEventListener('online',()=>{ if(wolk.vies) wolkOpslaan(); });
+
+function key(m=cur.mod,s=cur.sec,i=cur.i){ return m+'-'+s+'-'+i; }
+function st(k){ return S[k] || (S[k]={tries:0,hint:0,done:false,pts:0,skipped:false,shown:false,placed:[],sel:[],inp:{},wrong:[],cells:null,fb:null}); }
+function qlist(m=cur.mod,s=cur.sec){ const M=MODS[m]; return s==='opdr'?M.opdr:M.toets; }
+function curQ(){ return qlist()[cur.i]; }
+function esc(v){ return String(v==null?'':v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+function num(v){ if(v==null) return NaN; v=String(v).replace(/\s/g,'').replace(/[−–]/g,'-').replace(',','.'); if(v===''||v==='-') return NaN; return Number(v); }
+// Iedere zin op een nieuwe regel
+function lines(arr){ return (arr||[]).flatMap(t=>String(t).split(/(?<=[.!?])\s+/)).map(t=>`<p>${t}</p>`).join(''); }
+function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+const LOF = ['Goed gedaan!','Super, dat klopt!','Top! Helemaal goed.','Knap werk!','Yes, dat is goed!'];
+
+/* ============ ASSENSTELSEL TEKENEN (SVG) ============ */
+let UID = 0;
+function fmtN(v){ return String(+(+v).toFixed(2)).replace('.',','); }
+function tijd(h){ const u=Math.floor(h+1e-9); const m=Math.round((h-u)*60); return u+':'+String(m).padStart(2,'0'); }
+function geom(c){
+  const xs=c.xstep||1, ys=c.ystep||1, cw=c.cw||c.cell||32, ch=c.ch||c.cell||32;
+  const boek=!!c.boek;
+  const ml=boek?64:40, mr=boek?26:40, mt=boek?30:40, mb=boek?(c.xrot?78:56):40;
+  const nx=Math.round((c.xmax-c.xmin)/xs), ny=Math.round((c.ymax-c.ymin)/ys);
+  const zx=c.xzaag?Math.max(cw,26):0, zy=c.yzaag?Math.max(ch,26):0;
+  return {xs,ys,cw,ch,ml,mt,nx,ny,zx,zy,W:ml+zx+nx*cw+mr,H:mt+ny*ch+zy+mb,
+    X:x=>ml+zx+(x-c.xmin)/xs*cw, Y:y=>mt+(c.ymax-y)/ys*ch};
+}
+function curveD(pts,g,smooth){
+  const p=pts.map(([x,y])=>[g.X(x),g.Y(y)]), r=v=>v.toFixed(1);
+  let d='M'+r(p[0][0])+','+r(p[0][1]);
+  for(let i=0;i<p.length-1;i++){
+    if(!smooth){ d+='L'+r(p[i+1][0])+','+r(p[i+1][1]); continue; }
+    const p0=p[i-1]||p[i], p1=p[i], p2=p[i+1], p3=p[i+2]||p2, t=1/6;
+    d+=`C${r(p1[0]+(p2[0]-p0[0])*t)},${r(p1[1]+(p2[1]-p0[1])*t)} ${r(p2[0]-(p3[0]-p1[0])*t)},${r(p2[1]-(p3[1]-p1[1])*t)} ${r(p2[0])},${r(p2[1])}`;
+  }
+  return d;
+}
+function funD(f,a,b,g){ let d=''; const n=200; for(let k=0;k<=n;k++){ const x=a+(b-a)*k/n; d+=(k?'L':'M')+g.X(x).toFixed(1)+','+g.Y(f(x)).toFixed(1); } return d; }
+function pathF(f,c,g,cls,id){ return `<path class="${cls}" d="${funD(f,c.xmin,c.xmax,g)}" clip-path="url(#${id})"/>`; }
+function lijnD(l,c,g){ return l.f ? funD(l.f, l.from!=null?l.from:c.xmin, l.to!=null?l.to:c.xmax, g) : curveD(l.pts,g,l.smooth); }
+function segD(seg,line,g){ return seg.from!=null ? funD(line.f,seg.from,seg.to,g) : curveD(seg.pts,g,line.smooth); }
+function segMid(seg,line){
+  if(seg.from!=null){ const x=(seg.from+seg.to)/2; return {x,y:line.f(x)}; }
+  const p=seg.pts, a=p[0], b=p[p.length-1]; return {x:(a[0]+b[0])/2,y:(a[1]+b[1])/2};
+}
+function zigH(x,y){ return `<rect x="${x-11}" y="${y-8}" width="22" height="16" fill="#fff"/><path class="zz" d="M${x-10},${y} l3,-6 l6,12 l6,-12 l3,6"/>`; }
+function zigV(x,y){ return `<rect x="${x-8}" y="${y-11}" width="16" height="22" fill="#fff"/><path class="zz" d="M${x},${y+10} l-6,-3 l12,-6 l-12,-6 l6,-3"/>`; }
+function tagSvg(t,kl,X,Y){
+  const x=X(t.x), y=Y(t.y);
+  if(t.rond) return `<circle class="tagc ${kl}" cx="${x}" cy="${y}" r="10"/><text class="tagt" x="${x}" y="${y+4.5}" text-anchor="middle">${t.t}</text>`;
+  return `<text class="tagl ${kl}" x="${x}" y="${y}" text-anchor="${t.a||'middle'}">${t.t}</text>`;
+}
+function svgGraph(c,ex){
+  ex=ex||{}; const g=geom(c), X=g.X, Y=g.Y, id='clip'+(++UID);
+  const L=X(c.xmin), Rr=X(c.xmax), Tp=Y(c.ymax), B=Y(c.ymin);
+  const ay = c.yzaag ? B+g.zy : ((c.ymin<=0&&c.ymax>=0)?Y(0):B);
+  const ax = c.xzaag ? L-g.zx : ((c.xmin<=0&&c.xmax>=0)?X(0):L);
+  const yBot = c.yzaag ? ay : B, xLeft = c.xzaag ? ax : L;
+  const xf=v=>c.xfmt?c.xfmt(v):fmtN(v);
+  const both = !c.xzaag && !c.yzaag && c.xmin<=0&&c.xmax>=0&&c.ymin<=0&&c.ymax>=0;
+  let s=`<svg class="graph${ex.klik?' klik':''}" viewBox="0 0 ${g.W} ${g.H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="assenstelsel">`;
+  s+=`<defs><clipPath id="${id}"><rect x="${L}" y="${Tp}" width="${Rr-L}" height="${B-Tp}"/></clipPath></defs>`;
+  for(let i=0;i<=g.nx;i++){ const x=L+i*g.cw; s+=`<line class="rl" x1="${x}" y1="${Tp}" x2="${x}" y2="${B}"/>`; }
+  for(let j=0;j<=g.ny;j++){ const y=Tp+j*g.ch; s+=`<line class="rl" x1="${L}" y1="${y}" x2="${Rr}" y2="${y}"/>`; }
+  s+=`<line class="as" x1="${xLeft}" y1="${ay}" x2="${Rr+14}" y2="${ay}"/><polygon class="pijl" points="${Rr+22},${ay} ${Rr+12},${ay-5} ${Rr+12},${ay+5}"/>`;
+  s+=`<line class="as" x1="${ax}" y1="${yBot}" x2="${ax}" y2="${Tp-14}"/><polygon class="pijl" points="${ax},${Tp-22} ${ax-5},${Tp-12} ${ax+5},${Tp-12}"/>`;
+  if(c.xzaag) s+=zigH(ax+g.zx*0.45,ay);
+  if(c.yzaag) s+=zigV(ax,ay-g.zy*0.5);
+  if(c.boek){
+    s+=`<text class="aslab boek" x="${Rr+18}" y="${ay+(c.xrot?62:36)}" text-anchor="end">${c.xlabel||''}</text>`;
+    const xl=Math.max(12,ax-46), ym=(Tp+yBot)/2;
+    s+=`<text class="aslab boek" x="${xl}" y="${ym}" text-anchor="middle" transform="rotate(-90 ${xl} ${ym})">${c.ylabel||''}</text>`;
+  } else {
+    s+=`<text class="aslab" x="${g.W-4}" y="${ay-8}" text-anchor="end">${c.xlabel||'x'}</text>`;
+    s+=`<text class="aslab" x="${ax+10}" y="${Tp-12}">${c.ylabel||'y'}</text>`;
+  }
+  for(let i=0;i<=g.nx;i++){
+    if(i%(c.xevery||1)) continue;
+    const v=+(c.xmin+i*g.xs).toFixed(4); if(both&&v===0) continue;
+    if(c.xrot) s+=`<text x="${X(v)+4}" y="${ay+8}" text-anchor="end" transform="rotate(-90 ${X(v)+4} ${ay+8})">${xf(v)}</text>`;
+    else s+=`<text x="${X(v)}" y="${ay+17}" text-anchor="middle">${xf(v)}</text>`;
+  }
+  for(let j=0;j<=g.ny;j++){
+    if(j%(c.yevery||1)) continue;
+    const v=+(c.ymin+j*g.ys).toFixed(4); if(both&&v===0) continue;
+    s+=`<text x="${ax-6}" y="${Y(v)+4}" text-anchor="end">${fmtN(v)}</text>`;
+  }
+  if(both) s+=`<text x="${ax-6}" y="${ay+17}" text-anchor="end">0</text>`;
+  if(c.xzaag && !(c.ymin<=0&&c.ymax>=0)) s+=`<text x="${ax}" y="${ay+17}" text-anchor="middle">0</text>`;
+  if(c.yzaag && c.xmin!==0) s+=`<text x="${ax-6}" y="${ay+4}" text-anchor="end">0</text>`;
+  (ex.vdash||[]).forEach(p=>{ s+=`<line class="vd" x1="${X(p.x)}" y1="${ay}" x2="${X(p.x)}" y2="${Y(p.y)}"/>`; });
+  (c.lines||[]).forEach(l=>{
+    s+=`<path class="ln ${l.kl}" d="${lijnD(l,c,g)}" clip-path="url(#${id})"/>`;
+    if(l.dots&&l.pts) l.pts.forEach(p=>{ s+=`<circle class="dotf ${l.kl}" cx="${X(p[0])}" cy="${Y(p[1])}" r="3.5"/>`; });
+    if(l.tag) s+=tagSvg(l.tag,l.kl,X,Y);
+  });
+  if(ex.lineSolid) s+=pathF(ex.lineSolid.f,c,g,'ln paars',id);
+  if(ex.lineDash) s+=pathF(ex.lineDash.f,c,g,'ln dash',id);
+  if(ex.polyline) s+=`<path class="ln ${ex.polyline.kl}" d="${curveD(ex.polyline.pts,g,false)}" clip-path="url(#${id})"/>`;
+  if(ex.poly && ex.poly.length>2) s+=`<polygon class="poly" points="${ex.poly.map(p=>X(p.x)+','+Y(p.y)).join(' ')}"/>`;
+  if(ex.color){
+    const C=ex.color;
+    C.segs.forEach((sg,i)=>{
+      const d=segD(sg,C.line,g);
+      if(C.sel.includes(i)) s+=`<path class="ln sel-${C.kleur}" d="${d}"/>`;
+      if(C.shown && C.target.includes(i) && !C.sel.includes(i)) s+=`<path class="ln dash" d="${d}"/>`;
+      if(C.shown && C.sel.includes(i) && !C.target.includes(i)){
+        const m=segMid(sg,C.line), px=X(m.x), py=Y(m.y);
+        s+=`<circle class="u-wrong" cx="${px}" cy="${py}" r="9"/><path class="kruis" d="M${px-4},${py-4} L${px+4},${py+4} M${px+4},${py-4} L${px-4},${py+4}"/>`;
+      }
+    });
+    if(C.klik) C.segs.forEach((sg,i)=>{ s+=`<path class="hit" data-seg="${i}" d="${segD(sg,C.line,g)}"/>`; });
+  }
+  (ex.guides||[]).forEach(p=>{
+    const px=X(p.x), py=Y(p.y);
+    s+=`<path class="gd" d="M${px},${ay} L${px},${py} L${ax},${py}"/><circle class="gdc" cx="${px}" cy="${py}" r="8"/>`;
+    const rechts = px > g.W-110;
+    s+=`<text class="gdt" x="${rechts?px-12:px+12}" y="${py-12+(p.dy||0)}" text-anchor="${rechts?'end':'start'}">${p.t||'('+xf(p.x)+', '+fmtN(p.y)+')'}</text>`;
+  });
+  (ex.notes||[]).forEach(n=>{ s+=`<text class="note" x="${X(n.x)+(n.dx||0)}" y="${Y(n.y)+(n.dy||0)}" text-anchor="${n.a||'middle'}">${n.t}</text>`; });
+  (ex.missing||[]).forEach(p=>{ s+=`<circle class="mis" cx="${X(p.x)}" cy="${Y(p.y)}" r="10"/>`; });
+  (ex.points||[]).forEach(p=>{
+    s+=`<circle class="pt" cx="${X(p.x)}" cy="${Y(p.y)}" r="6"/>`;
+    if(p.label) s+=`<text class="ptl" x="${X(p.x)+9}" y="${Y(p.y)-9}">${p.label}</text>`;
+  });
+  (ex.user||[]).forEach(p=>{
+    const px=X(p.x), py=Y(p.y);
+    s+=`<circle class="u-${p.kl}" cx="${px}" cy="${py}" r="7"/>`;
+    if(p.kl==='wrong') s+=`<path class="kruis" d="M${px-4},${py-4} L${px+4},${py+4} M${px+4},${py-4} L${px-4},${py+4}"/>`;
+  });
+  (ex.labels||[]).forEach(p=>{ s+=`<text class="ptl" x="${X(p.x)+9}" y="${Y(p.y)-9}">${p.label}</text>`; });
+  if(ex.klik) s+=`<circle class="ghost" r="8" cx="-50" cy="-50"/>`;
+  return s+'</svg>';
+}
+function legend(c){
+  const ls=((c&&c.lines)||[]).filter(l=>l.naam);
+  if(!ls.length) return '';
+  return `<div class="legend">${ls.map(l=>`<span><i class="sw ${l.kl}"></i>${l.naam}</span>`).join('')}</div>`;
+}
+function tabelHTML(xs,f,lx,ly){
+  return `<table class="tab"><tr><th>${lx||'x'}</th>${xs.map(x=>`<td>${fmtN(x)}</td>`).join('')}</tr><tr><th>${ly||'y'}</th>${xs.map(x=>`<td>${fmtN(f(x))}</td>`).join('')}</tr></table>`;
+}
+function tabelRows(r){
+  return `<table class="tab"><tr><th>${r.lx}</th>${r.xs.map(v=>`<td>${fmtN(v)}</td>`).join('')}</tr><tr><th>${r.ly}</th>${r.ys.map(v=>`<td>${fmtN(v)}</td>`).join('')}</tr></table>`;
+}
+
+/* ============ EXTRA'S IN DE GRAFIEK PER VRAAG ============ */
+function has(arr,p,tol){ tol=tol||0; return arr.some(a=>Math.abs(a.x-p.x)<1e-9&&Math.abs(a.y-p.y)<=tol+1e-9); }
+function exFor(q,s){
+  const ex={points:[],user:[],guides:[],missing:[],labels:[]};
+  const help = s.shown || s.done;
+  if(q.pt) ex.points.push(q.pt);
+  if(q.pts) ex.points.push(...q.pts);
+  if(q.type==='read' && help) ex.guides.push(q.ans);
+  if((q.type==='num'||q.type==='mc') && help && q.guides) ex.guides.push(...q.guides);
+  if(q.type==='plot'){
+    const tol=q.tol||0;
+    s.placed.forEach(p=>ex.user.push({x:p.x,y:p.y,kl:s.done?'right':s.shown?(has(q.targets,p,tol)?'right':'wrong'):'user'}));
+    if(s.shown && !s.done){
+      q.targets.filter(t=>!has(s.placed,t,tol)).forEach(t=>ex.missing.push(t));
+      if(q.targets.length===1) ex.guides.push(q.targets[0]);
+    }
+    if(s.done){
+      q.targets.forEach(t=>{ if(t.label) ex.labels.push(t); });
+      if(q.connect) ex.poly=q.targets;
+      if(q.f) ex.lineSolid={f:q.f};
+      if(q.joinPts) ex.polyline={pts:q.targets.slice().sort((a,b)=>a.x-b.x).map(t=>[t.x,t.y]),kl:q.joinKl||'paars'};
+    }
+    ex.klik = !s.done;
+  }
+  if(q.type==='plotLine'){
+    const on=p=>Math.abs(q.f(p.x)-p.y)<1e-9;
+    s.placed.forEach(p=>ex.user.push({x:p.x,y:p.y,kl:s.done?'right':s.shown?(on(p)?'right':'wrong'):'user'}));
+    if(s.done) ex.lineSolid={f:q.f}; else if(s.shown) ex.lineDash={f:q.f};
+    ex.klik = !s.done;
+  }
+  if(q.type==='color'){
+    ex.color={line:q.cfg.lines[q.lineIdx||0],segs:q.segs,sel:s.done?q.target:(s.sel||[]),kleur:q.kleur,target:q.target,shown:s.shown&&!s.done,klik:!s.done};
+  }
+  return ex;
+}
+
+/* ============ SCHERMEN ============ */
+function render(){
+  const app=document.getElementById('app');
+  tekenWie();
+  if(ONLINE && !LL){
+    app.innerHTML=renderLogin();
+    document.getElementById('score').style.display='none';
+    const f=document.getElementById(window._lk?(window._ln?'lp':'ln'):'lk'); if(f && !LADEN) f.focus();
+    return;
+  }
+  document.getElementById('score').style.display='';
+  let h='';
+  h+='<nav class="mods">'+MODS.map((M,i)=>`<button class="mod${i===cur.mod&&cur.sec!=='result'?' on':''}" onclick="go(${i},'uitleg',0)"><span class="nr">${i+1}</span>${M.kort}</button>`).join('')+'</nav>';
+  if(cur.sec!=='result'){
+    const nm={uitleg:'📖 Korte uitleg',opdr:'✏️ Opdrachten',toets:'🏁 Mini-toets'};
+    h+='<nav class="secs">'+Object.keys(nm).map(s=>`<button class="sec${s===cur.sec?' on':''}" onclick="go(${cur.mod},'${s}',0)">${nm[s]}</button>`).join('')+'</nav>';
+  }
+  if(cur.sec==='uitleg') h+=renderUitleg();
+  else if(cur.sec==='result') h+=renderResult();
+  else h+=renderVraag();
+  app.innerHTML=h;
+  afterRender();
+  updateScore();
+  bewaar();
+}
+
+function renderUitleg(){
+  const M=MODS[cur.mod], U=M.uitleg;
+  let h=`<article class="card"><h2>${U.titel}</h2><div class="uitleg-grid"><div class="lines">${lines(U.lines)}<div class="ezel">${lines([U.ezel])}</div></div><div>`;
+  if(U.tabel) h+=tabelHTML(U.tabel.xs,U.tabel.f);
+  h+=svgGraph(U.graph.cfg,U.graph.ex)+legend(U.graph.cfg);
+  h+=`<div class="lines tip" style="text-align:left;margin-top:6px">${lines(U.caption)}</div></div></div>`;
+  h+=`<div class="waarom lines"><h3>💼 Waar heb je dit nodig?</h3>${lines(U.waarom)}</div>`;
+  h+=`<p class="tip" style="margin-top:10px">🎯 Eindterm: ${M.et}</p>`;
+  h+=`<button class="btn groot" onclick="go(${cur.mod},'opdr',0)">Start de opdrachten →</button></article>`;
+  return h;
+}
+
+function secPunten(m,s){ return qlist(m,s).reduce((a,_,i)=>a+((S[key(m,s,i)]||{}).pts||0),0); }
+
+function renderVraag(){
+  const L=qlist(), q=curQ(), s=st(key());
+  let h=`<div class="secinfo">${cur.sec==='toets'?'Mini-toets':'Opdrachten'}: ${secPunten(cur.mod,cur.sec)} van ${L.length*2} punten</div>`;
+  h+='<div class="dots">'+L.map((_,i)=>{
+    const t=S[key(cur.mod,cur.sec,i)]; let cl='';
+    if(t){ if(t.done) cl=t.pts===2?'d2':'d1'; else if(t.skipped) cl='sk'; else if(t.tries) cl='bz'; }
+    return `<button class="dot ${cl}${i===cur.i?' cur':''}" onclick="go(${cur.mod},'${cur.sec}',${i})" aria-label="vraag ${i+1}">${i+1}</button>`;
+  }).join('')+'</div>';
+
+  h+=`<article class="card"><div class="qhead"><span class="qnr">${cur.sec==='toets'?'Toetsvraag':'Opdracht'} ${cur.i+1} van ${L.length}</span><span class="et">🎯 Eindterm: ${q.et||MODS[cur.mod].et}</span></div>`;
+  if(q.context) h+=`<div class="context lines">${lines(q.context)}</div>`;
+  h+=`<div class="qtext lines">${lines(q.text)}</div>`;
+  if(q.tabRows) h+=tabelRows(q.tabRows);
+  if(q.tabel) h+=tabelHTML(q.tabel.xs,q.tabel.f,q.tabel.lx,q.tabel.ly);
+  if(q.cfg){ const gr=svgGraph(q.cfg,exFor(q,s)); h+= q.cfg2?`<div class="duo">${gr}${svgGraph(q.cfg2,{})}</div>`:gr; if(!q.noLegend) h+=legend(q.cfg); }
+
+  h+='<div class="antwoord">';
+  const dis = s.done?'disabled':'';
+  const enter = `onkeydown="if(event.key==='Enter')check()"`;
+  if(q.type==='read'){
+    const cx = s.done?'g':(s.mark&&s.mark.x||''), cy = s.done?'g':(s.mark&&s.mark.y||'');
+    h+=`<div class="coord"><span class="haak">(</span><label><input class="ant ${cx}" id="ix" value="${esc(s.inp.x)}" oninput="saveInp('x',this.value)" ${enter} ${dis} aria-label="x"><small>x</small></label><span class="haak">,</span><label><input class="ant ${cy}" id="iy" value="${esc(s.inp.y)}" oninput="saveInp('y',this.value)" ${enter} ${dis} aria-label="y"><small>y</small></label><span class="haak">)</span></div>`;
+  } else if(q.type==='num'){
+    h+=`<div class="numrij">${q.lbl||'Antwoord:'} <input class="ant ${s.done?'g':''}" id="in1" value="${esc(s.inp.a)}" oninput="saveInp('a',this.value)" ${enter} ${dis}> ${q.unit||''}</div>`;
+  } else if(q.type==='mc'){
+    h+=`<div class="opts">${q.opts.map((o,i)=>{
+      let cl=''; if(s.done&&i===q.ans) cl='g'; else if(s.wrong.includes(i)) cl='f'; else if(s.shown&&i===q.ans) cl='hint';
+      return `<button class="opt ${cl}" onclick="choose(${i})" ${s.done||s.wrong.includes(i)?'disabled':''}>${o}</button>`;
+    }).join('')}</div>`;
+  } else if(q.type==='table'){
+    h+=`<table class="tab"><tr><th>${q.lx||'x'}</th>${q.xs.map(x=>`<td>${x}</td>`).join('')}</tr><tr><th>${q.ly||'y'}</th>${q.xs.map((x,i)=>{
+      const cl = s.done?'g':(s.cells?s.cells[i]:'');
+      return `<td><input class="ant small ${cl}" id="t${i}" value="${esc(s.inp['t'+i])}" oninput="saveInp('t${i}',this.value)" ${enter} ${dis} aria-label="y bij x = ${x}"></td>`;
+    }).join('')}</tr></table>`;
+  } else if(q.type==='color'){
+    if(!s.done) h+=`<div class="tip lines">${lines([`Klik op een stuk van de grafiek. Het wordt dan ${q.kleur}.`,'Klik nog een keer om de kleur weg te halen.'])}</div><button class="btn wis" onclick="wisSel()">🧽 Wis de kleuren</button>`;
+  } else if(q.type==='plot'||q.type==='plotLine'){
+    if(!s.done) h+=`<div class="tip lines">${lines(['Klik op een kruispunt van de lijnen om een punt te zetten.','Klik nog een keer op het punt om het weg te halen.'])}</div><button class="btn wis" onclick="wis()">🧽 Wis alle punten</button>`;
+  }
+  h+='</div>';
+
+  if(s.hint>0) h+=`<div class="box hintbox lines">${q.hints.slice(0,s.hint).map((t,i)=>`<b>💡 Hint ${i+1}</b>${lines([t])}`).join('')}</div>`;
+  if(s.fb) h+=`<div class="box ${s.fb.k} lines">${lines(s.fb.l)}</div>`;
+  if(s.shown && !s.done) h+=`<div class="box oplossing lines"><h3>🔍 Zo zit het</h3>${lines(q.explain)}</div>`;
+
+  h+='<div class="knoppen">';
+  h+=`<button class="btn hint" onclick="hint()" ${s.done||s.hint>=q.hints.length?'disabled':''}>💡 Hint${s.hint?` (${s.hint}/${q.hints.length})`:''}</button>`;
+  if(q.type!=='mc') h+=`<button class="btn check" onclick="check()" ${dis}>✔ Controleer</button>`;
+  if(!s.done) h+=`<button class="btn skip" onclick="skip()">Overslaan ⏭</button>`;
+  h+='</div>';
+  h+=`<div class="navknoppen"><button class="btn nav" onclick="prev()">← Vorige</button><button class="btn nav ${s.done?'glow':''}" onclick="next()">${nextLabel()} →</button></div>`;
+  h+='</article>';
+  return h;
+}
+
+function renderResult(){
+  let tot=0,max=0,rows='',open=[];
+  MODS.forEach((M,m)=>{
+    const po=secPunten(m,'opdr'), pt=secPunten(m,'toets');
+    const mo=M.opdr.length*2, mt=M.toets.length*2;
+    tot+=po+pt; max+=mo+mt;
+    rows+=`<tr><td><b>${m+1}. ${M.kort}</b></td><td>${po} / ${mo}</td><td>${pt} / ${mt}</td></tr>`;
+    ['opdr','toets'].forEach(s=>qlist(m,s).forEach((_,i)=>{
+      const t=S[key(m,s,i)];
+      if(!t||!t.done) open.push(`<button class="linkbtn" onclick="go(${m},'${s}',${i})">Module ${m+1} · ${s==='opdr'?'opdracht':'toetsvraag'} ${i+1}</button>`);
+    }));
+  });
+  const pct = max?Math.round(tot/max*100):0;
+  const msg = pct>=80?['Wauw, wat goed!','Jij snapt grafieken echt.']:pct>=55?['Goed bezig!','Oefen de open vragen nog een keer.']:['Je bent goed op weg.','Kijk de uitleg nog eens en probeer de open vragen.'];
+  let h=`<article class="card"><h2>⭐ Mijn punten</h2><div class="lines">${lines(msg)}</div>`;
+  h+=`<p style="font-size:1.4rem;font-weight:800;color:var(--roze)">${tot} van ${max} punten</p>`;
+  h+=`<table class="res"><tr><th>Module</th><th>Opdrachten</th><th>Mini-toets</th></tr>${rows}</table>`;
+  h+=`<div class="box info lines">${lines(['2 punten: in één keer goed.','1 punt: goed met een hint of na verbeteren.'])}</div>`;
+  if(open.length) h+=`<h3 style="margin-top:14px">Nog niet af (${open.length}):</h3><div>${open.join(' · ')}</div>`;
+  h+=`<button class="btn skip" style="margin-top:18px" onclick="opnieuw()">↺ Alles opnieuw beginnen</button></article>`;
+  return h;
+}
+
+/* ============ INTERACTIE ============ */
+function afterRender(){
+  const q = (cur.sec==='opdr'||cur.sec==='toets') ? curQ() : null;
+  if(!q) return;
+  const s=st(key()); if(s.done) return;
+  if(q.type==='color'){
+    document.querySelectorAll('svg.graph .hit').forEach(el=>el.addEventListener('click',()=>toggleSeg(+el.getAttribute('data-seg'))));
+    return;
+  }
+  if(q.type!=='plot'&&q.type!=='plotLine') return;
+  const svg=document.querySelector('svg.graph.klik'); if(!svg) return;
+  const ghost=svg.querySelector('.ghost'); const c=q.cfg, g=geom(c);
+  const sx=c.snapX||g.xs, sy=c.snapY||g.ys;
+  function toGrid(e){
+    const pt=svg.createSVGPoint(); pt.x=e.clientX; pt.y=e.clientY;
+    const p=pt.matrixTransform(svg.getScreenCTM().inverse());
+    const rx=c.xmin+(p.x-g.X(c.xmin))/g.cw*g.xs, ry=c.ymax-(p.y-g.Y(c.ymax))/g.ch*g.ys;
+    const gx=+(Math.round(rx/sx)*sx).toFixed(4), gy=+(Math.round(ry/sy)*sy).toFixed(4);
+    if(gx<c.xmin-1e-9||gx>c.xmax+1e-9||gy<c.ymin-1e-9||gy>c.ymax+1e-9) return null;
+    return {x:gx,y:gy};
+  }
+  svg.addEventListener('mousemove',e=>{ const p=toGrid(e); if(p){ghost.setAttribute('cx',g.X(p.x));ghost.setAttribute('cy',g.Y(p.y));} else {ghost.setAttribute('cx',-50);} });
+  svg.addEventListener('mouseleave',()=>ghost.setAttribute('cx',-50));
+  svg.addEventListener('click',e=>{ const p=toGrid(e); if(p) toggle(p.x,p.y); });
+}
+function toggleSeg(i){ const s=st(key()); if(s.done) return; s.sel=s.sel||[]; const k=s.sel.indexOf(i); if(k>=0) s.sel.splice(k,1); else s.sel.push(i); render(); }
+function wisSel(){ const s=st(key()); if(!s.done){ s.sel=[]; render(); } }
+function toggle(x,y){
+  const s=st(key()); if(s.done) return;
+  const i=s.placed.findIndex(p=>p.x===x&&p.y===y);
+  if(i>=0) s.placed.splice(i,1); else s.placed.push({x,y});
+  render();
+}
+function wis(){ const s=st(key()); if(!s.done){ s.placed=[]; render(); } }
+function saveInp(k,v){ st(key()).inp[k]=v; }
+function hint(){ const q=curQ(), s=st(key()); if(s.done) return; s.hint=Math.min(s.hint+1,q.hints.length); render(); }
+function skip(){ const s=st(key()); if(!s.done) s.skipped=true; next(); }
+function maxTries(q){ return q.type==='mc' ? Math.min(4,q.opts.length-1) : 4; }
+
+function result(ok,tip){
+  const q=curQ(), s=st(key());
+  if(ok){
+    s.done=true; s.skipped=false;
+    s.pts=(s.tries===0&&s.hint===0)?2:1;
+    s.fb={k:'good',l:[pick(LOF), s.pts===2?'In één keer goed: je krijgt 2 punten!':'Je krijgt 1 punt.'].concat(q.praise||[])};
+  } else {
+    s.tries++;
+    if(s.tries>=maxTries(q) && !s.shown){
+      s.shown=true;
+      s.fb={k:'bad',l:['Dit is lastig, dat is niet erg!'].concat(tip,['Kijk naar de uitleg hieronder.','In het groen zie je precies hoe het goede antwoord eruitziet.','Probeer het daarna nog een keer.'])};
+    } else if(s.shown){
+      s.fb={k:'bad',l:['Nog niet goed.'].concat(tip,['Kijk goed naar de groene hulp en de uitleg.'])};
+    } else {
+      s.fb={k:'bad',l:['Nog niet goed.'].concat(tip,['Probeer het nog een keer.','Je kunt ook een hint gebruiken.'])};
+    }
+  }
+  render();
+}
+function info(t){ st(key()).fb={k:'info',l:t}; render(); }
+
+function check(){
+  const q=curQ(), s=st(key()); if(s.done) return;
+  if(q.type==='read'){
+    const x=num(s.inp.x), y=num(s.inp.y);
+    if(isNaN(x)||isNaN(y)) return info(['Vul bij x én bij y een getal in.']);
+    const ok = x===q.ans.x && y===q.ans.y;
+    s.mark={x:x===q.ans.x?'g':'f', y:y===q.ans.y?'g':'f'};
+    let tip=[];
+    if(!ok){
+      if(x===q.ans.y && y===q.ans.x) tip=['Let op: je hebt x en y omgedraaid.','Eerst x (links of rechts), dan y (omhoog of omlaag).'];
+      else if(x===q.ans.x) tip=['Je x is goed!','Kijk nog eens naar y.','Ligt het punt boven of onder de x-as?'];
+      else if(y===q.ans.y) tip=['Je y is goed!','Kijk nog eens naar x.','Ligt het punt links of rechts van de y-as?'];
+      else if(x===-q.ans.x || y===-q.ans.y) tip=['Kijk goed naar de min (-).','Links en omlaag krijgen een min.'];
+    }
+    return result(ok,tip);
+  }
+  if(q.type==='num'){
+    const a=num(s.inp.a);
+    if(isNaN(a)) return info(['Vul eerst een getal in.']);
+    let tip=[];
+    if(a!==q.ans && a===-q.ans) tip=['Bijna!','Kijk goed naar de min (-).','Is de uitkomst boven of onder de 0?'];
+    return result(a===q.ans,tip);
+  }
+  if(q.type==='table'){
+    const vals=q.xs.map((x,i)=>num(s.inp['t'+i]));
+    if(vals.some(isNaN)) return info(['Vul alle vakjes in de tabel in.']);
+    s.cells=q.xs.map((x,i)=>vals[i]===q.f(x)?'g':'f');
+    const goed=s.cells.filter(c=>c==='g').length;
+    return result(goed===q.xs.length,[`${goed} van de ${q.xs.length} vakjes zijn goed.`,'De rode vakjes kloppen nog niet.']);
+  }
+  if(q.type==='plot'){
+    const T=q.targets, P=s.placed;
+    if(P.length===0) return info(['Je hebt nog geen punt gezet.','Klik in het assenstelsel om een punt te zetten.']);
+    const ok = P.length===T.length && T.every(t=>has(P,t,q.tol));
+    let tip=[];
+    if(!ok){
+      if(T.length===1 && P.length===1){
+        const p=P[0], t=T[0];
+        if(p.x===t.y&&p.y===t.x) tip=['Let op: je hebt x en y omgedraaid.','Eerst x (opzij), dan y (omhoog of omlaag).'];
+        else if(p.x===t.x) tip=['Je bent goed opzij gegaan.','Kijk nog eens naar omhoog of omlaag (y).'];
+        else if(p.y===t.y) tip=['Je bent goed omhoog of omlaag gegaan.','Kijk nog eens naar links of rechts (x).'];
+        else tip=['Je punt staat op de verkeerde plek.','Begin opnieuw in de oorsprong (0, 0).'];
+      } else if(P.length!==T.length){
+        tip=[`Je hebt ${P.length} ${P.length===1?'punt':'punten'} gezet.`,`Er moeten ${T.length} punten komen.`];
+      } else {
+        tip=[`${T.filter(t=>has(P,t,q.tol)).length} van de ${T.length} punten staan goed.`];
+      }
+    }
+    return result(ok,tip);
+  }
+  if(q.type==='color'){
+    const sel=s.sel||[];
+    if(!sel.length) return info(['Je hebt nog niets gekleurd.','Klik op een stuk van de grafiek.']);
+    const T=q.target, fout=sel.filter(i=>!T.includes(i)).length, mist=T.filter(t=>!sel.includes(t)).length;
+    let tip=[];
+    if(fout) tip.push(fout===1?'Eén gekleurd stuk klopt niet.':`${fout} gekleurde stukken kloppen niet.`);
+    if(mist) tip.push(mist===1?'Je mist nog één stuk.':`Je mist nog ${mist} stukken.`);
+    return result(!fout&&!mist,tip);
+  }
+  if(q.type==='plotLine'){
+    const P=s.placed;
+    if(P.length===0) return info(['Je hebt nog geen punt gezet.','Klik in het assenstelsel om een punt te zetten.']);
+    const on=p=>Math.abs(q.f(p.x)-p.y)<1e-9;
+    const goed=P.filter(on).length, fout=P.length-goed;
+    let tip=[];
+    if(fout>0) tip.push(`${fout} ${fout===1?'punt ligt':'punten liggen'} niet op de grafiek.`);
+    if(goed<q.min) tip.push(`Je hebt ${goed} goede ${goed===1?'punt':'punten'}.`,`Je hebt er minstens ${q.min} nodig.`);
+    return result(fout===0&&goed>=q.min,tip);
+  }
+}
+function choose(i){
+  const q=curQ(), s=st(key()); if(s.done||s.wrong.includes(i)) return;
+  if(i===q.ans) return result(true,[]);
+  s.wrong.push(i);
+  result(false,[`"${q.opts[i]}" is niet goed.`]);
+}
+
+/* ============ NAVIGATIE ============ */
+function go(m,s,i){ cur={mod:m,sec:s,i:i}; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+function nextLabel(){
+  const L=qlist();
+  if(cur.i<L.length-1) return 'Volgende';
+  if(cur.sec==='opdr') return 'Naar de mini-toets';
+  if(cur.mod<MODS.length-1) return `Naar module ${cur.mod+2}`;
+  return 'Bekijk je punten';
+}
+function next(){
+  const L=qlist();
+  if(cur.i<L.length-1) go(cur.mod,cur.sec,cur.i+1);
+  else if(cur.sec==='opdr') go(cur.mod,'toets',0);
+  else if(cur.mod<MODS.length-1) go(cur.mod+1,'uitleg',0);
+  else go(cur.mod,'result',0);
+}
+function prev(){
+  if(cur.i>0) go(cur.mod,cur.sec,cur.i-1);
+  else if(cur.sec==='toets') go(cur.mod,'opdr',MODS[cur.mod].opdr.length-1);
+  else if(cur.sec==='opdr') go(cur.mod,'uitleg',0);
+}
+function updateScore(){
+  document.getElementById('score').textContent=`⭐ ${totaalPunten()} punten`;
+}
+function opnieuw(){
+  if(!confirm('Weet je het zeker? Al je punten worden gewist.')) return;
+  S={}; go(0,'uitleg',0);
+}
+
+if(ONLINE){
+  let ses=null; try{ ses=JSON.parse(sessionStorage.getItem(SESSIE)||'null'); }catch(e){}
+  if(ses && ses.klascode){ aanmelden(ses.klascode, ses.naam, ses.pin, true); } else render();
+} else render();
+</script>
+</body>
+</html>

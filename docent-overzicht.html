@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Docentoverzicht</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<style>
+:root{
+  --roze: rgb(233,36,213);
+  --paars: rgb(94,6,150);
+  --cyaan: rgb(69,237,255);
+  --tekst: #2a1440;
+  --grijs: #6f5d80;
+  --lijn: #ece2f4;
+  --goed: #1a9e5a;
+  --oranje: #e08a00;
+  --fout: #d62828;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Montserrat',sans-serif;background:#faf6fd;color:var(--tekst);font-size:15px;line-height:1.45}
+header{background:linear-gradient(90deg,var(--paars),var(--roze));color:#fff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+header h1{margin:0;font-size:1.2rem;font-weight:800}
+header .rechts{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-weight:600;font-size:.9rem}
+main{max-width:1200px;margin:0 auto;padding:16px}
+.card{background:#fff;border-radius:16px;padding:16px;box-shadow:0 4px 18px rgba(94,6,150,.08);margin-bottom:16px}
+h2{color:var(--paars);margin:0 0 10px;font-size:1.15rem}
+h3{color:var(--paars);margin:14px 0 6px;font-size:1rem}
+label{font-weight:700;color:var(--paars);display:block;margin:10px 0 4px}
+input,select{font:600 1rem 'Montserrat',sans-serif;border:2px solid #cdb8de;border-radius:10px;padding:8px 10px;color:var(--tekst);background:#fff;max-width:100%}
+input:focus,select:focus{outline:3px solid var(--cyaan);border-color:var(--paars)}
+.btn{font:700 .95rem 'Montserrat',sans-serif;border-radius:10px;padding:9px 14px;border:none;cursor:pointer;background:var(--roze);color:#fff}
+.btn.licht{background:#fff;border:2px solid var(--paars);color:var(--paars)}
+.btn.wit{background:transparent;border:2px solid #fff;color:#fff;padding:6px 12px}
+.btn.gevaar{background:#fff;border:2px solid var(--fout);color:var(--fout)}
+.btn:disabled{opacity:.5;cursor:default}
+.rij{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.melding{font-weight:700;margin-top:8px;min-height:1.2em}
+.melding.fout{color:var(--fout)} .melding.goed{color:var(--goed)}
+.login{max-width:420px;margin:30px auto}
+.login input{width:100%}
+.login .btn{width:100%;margin-top:14px}
+.linkbtn{background:none;border:none;color:var(--roze);font:700 .9rem 'Montserrat',sans-serif;cursor:pointer;text-decoration:underline;padding:0}
+.klassen{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-bottom:12px}
+.klas{border:2px solid var(--lijn);border-radius:14px;padding:12px;position:relative}
+.klas .naam{font-weight:800;font-size:1.05rem}
+.klas .code{font-size:1.5rem;font-weight:800;letter-spacing:.12em;color:var(--roze);margin:4px 0}
+.klas .klein{font-size:.82rem;color:var(--grijs)}
+.klas .acties{display:flex;gap:6px;margin-top:8px}
+.klas .acties button{font-size:.8rem;padding:5px 9px}
+.tegels{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin:12px 0}
+.tegel{background:#f6eefc;border-radius:12px;padding:12px}
+.tegel b{display:block;font-size:1.6rem;color:var(--paars)}
+.tegel span{font-size:.85rem;color:var(--grijs);font-weight:600}
+.balken{display:grid;gap:6px;margin-top:6px}
+.balk{display:grid;grid-template-columns:minmax(120px,220px) 1fr 52px;gap:8px;align-items:center;font-size:.88rem;font-weight:600}
+.balk .bak{background:#f1e8f8;border-radius:6px;height:14px;overflow:hidden}
+.balk .vul{height:100%;background:var(--paars);border-radius:6px}
+.balk .vul.t{background:var(--roze)}
+.tabelwrap{overflow-x:auto;border:1px solid var(--lijn);border-radius:12px}
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th,td{padding:8px 10px;border-bottom:1px solid var(--lijn);text-align:left;white-space:nowrap}
+th{background:#f6eefc;color:var(--paars);position:sticky;top:0;cursor:pointer;user-select:none}
+th[aria-sort="ascending"]::after{content:" ▲"} th[aria-sort="descending"]::after{content:" ▼"}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+tr.lln:hover td{background:#fbf6ff;cursor:pointer}
+tr.open td{background:#f3e9fa}
+.pct{display:inline-block;min-width:44px;text-align:right;font-weight:800}
+.lage{color:var(--fout)}
+.mcel{font-variant-numeric:tabular-nums}
+.mcel small{color:var(--grijs)}
+.detail td{background:#fff;white-space:normal;padding:14px}
+.mod-detail{margin-bottom:10px}
+.mod-detail .titel{font-weight:800;color:var(--paars);margin-bottom:4px}
+.bolletjes{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+.bolletjes .sep{width:10px}
+.bol{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:.72rem;font-weight:800;border:2px solid #d8cbe4;background:#fff;color:#8b7a9c}
+.bol.p2{background:var(--goed);border-color:var(--goed);color:#fff}
+.bol.p1{background:var(--paars);border-color:var(--paars);color:#fff}
+.bol.bezig{background:#fff3dc;border-color:var(--oranje);color:var(--oranje)}
+.bol.over{border-style:dashed;border-color:#999;color:#777}
+.bol.hulp{box-shadow:0 0 0 3px rgba(214,40,40,.35)}
+.legenda{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--grijs);margin:8px 0;align-items:center}
+.legenda span{display:flex;gap:5px;align-items:center}
+.legenda .bol{width:18px;height:18px;font-size:0}
+.moeilijk td{white-space:normal}
+.leeg{color:var(--grijs);font-style:italic;padding:16px}
+.verborgen{display:none !important}
+.uitleg{font-size:.88rem;color:var(--grijs)}
+@media (max-width:600px){ .balk{grid-template-columns:1fr 1fr 44px} }
+</style>
+</head>
+<body>
+<header>
+  <h1>📊 Docentoverzicht wiskunde-apps</h1>
+  <div class="rechts" id="kop"></div>
+</header>
+<main>
+  <!-- ======== Niet ingesteld ======== -->
+  <section id="nietIngesteld" class="card verborgen">
+    <h2>Nog niet ingesteld</h2>
+    <p>Vul bovenin dit bestand bij <b>SUPABASE_URL</b> en <b>SUPABASE_KEY</b> je eigen gegevens in.</p>
+    <p class="uitleg">Je vindt ze in Supabase onder Project Settings → API.</p>
+  </section>
+
+  <!-- ======== Inloggen ======== -->
+  <section id="inlog" class="card login verborgen">
+    <h2 id="inlogTitel">Inloggen als docent</h2>
+    <form id="inlogForm">
+      <label for="email">E-mailadres</label>
+      <input id="email" type="email" autocomplete="username" required>
+      <label for="ww">Wachtwoord</label>
+      <input id="ww" type="password" autocomplete="current-password" required minlength="8">
+      <button class="btn" id="inlogKnop" type="submit">Inloggen</button>
+    </form>
+    <div class="melding" id="inlogMelding"></div>
+    <p class="uitleg"><button class="linkbtn" id="wisselModus">Nog geen account? Maak er een.</button></p>
+  </section>
+
+  <!-- ======== Dashboard ======== -->
+  <div id="dash" class="verborgen">
+    <section class="card">
+      <h2>Mijn klassen</h2>
+      <p class="uitleg">Geef leerlingen de klascode. Ze vullen die in als ze de app openen, samen met hun naam en een eigen pincode.</p>
+      <div class="klassen" id="klassen"></div>
+      <form class="rij" id="klasForm">
+        <div><label for="nieuweKlas">Nieuwe klas</label><input id="nieuweKlas" placeholder="bijv. 2BB-A" maxlength="40" required></div>
+        <button class="btn" type="submit">+ Klas maken</button>
+      </form>
+      <div class="melding" id="klasMelding"></div>
+    </section>
+
+    <section class="card">
+      <div class="rij" style="justify-content:space-between">
+        <h2 style="margin:0">Resultaten</h2>
+        <div class="rij">
+          <div><label for="kiesApp">App</label><select id="kiesApp"></select></div>
+          <div><label for="kiesKlas">Klas</label><select id="kiesKlas"></select></div>
+          <div><label for="zoek">Zoek leerling</label><input id="zoek" placeholder="naam…" style="width:150px"></div>
+          <button class="btn licht" id="ververs" title="Opnieuw ophalen">↻ Vernieuwen</button>
+        </div>
+      </div>
+      <div class="melding" id="dataMelding"></div>
+      <div id="resultaten"></div>
+    </section>
+  </div>
+</main>
+
+<script>
+/* ============ INSTELLINGEN ============ */
+// Vul hier dezelfde gegevens in als in de app (Supabase -> Project Settings -> API).
+const SUPABASE_URL = 'https://cyacjfgffxfyqknygfpm.supabase.co';   // bijvoorbeeld: 'https://abcdefghijkl.supabase.co'
+const SUPABASE_KEY = 'sb_publishable_PpC5ITnnuuC-200UnVX6gQ_3gSVGb01';   // de "anon public" key (of "publishable" key)
+
+/* ============ HULP ============ */
+const $ = id => document.getElementById(id);
+const esc = v => String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const komma = (n, d=1) => (Math.round(n * 10**d) / 10**d).toFixed(d).replace('.', ',');
+const toon = (id, ja) => $(id).classList.toggle('verborgen', !ja);
+function melding(id, tekst, soort){ const m=$(id); m.textContent=tekst||''; m.className='melding '+(soort||''); }
+function wanneer(iso){
+  if(!iso) return '–';
+  const d=new Date(iso), nu=new Date(), min=Math.round((nu-d)/60000);
+  if(min<1) return 'zojuist';
+  if(min<60) return min+' min geleden';
+  const vandaag=new Date(nu.getFullYear(),nu.getMonth(),nu.getDate());
+  const tijd=d.toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'});
+  if(d>=vandaag) return 'vandaag '+tijd;
+  if(d>=new Date(vandaag-864e5)) return 'gisteren '+tijd;
+  return d.toLocaleDateString('nl-NL',{day:'numeric',month:'short'})+' '+tijd;
+}
+function nieuweCode(){
+  const tekens='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';   // geen 0/O en 1/I, om verwarring te voorkomen
+  const r=new Uint32Array(6); crypto.getRandomValues(r);
+  return Array.from(r, x=>tekens[x%tekens.length]).join('');
+}
+
+/* ============ START ============ */
+let sb = null, gebruiker = null, maakAccount = false;
+let KLASSEN = [], RIJEN = [], openId = null, sortKol = 'naam', sortOp = true, verversTimer = null;
+
+if(!SUPABASE_URL || !SUPABASE_KEY || !window.supabase){
+  toon('nietIngesteld', true);
+  if(SUPABASE_URL && SUPABASE_KEY) $('nietIngesteld').querySelector('p').textContent = 'De Supabase-bibliotheek kon niet laden. Controleer je internetverbinding en vernieuw de pagina.';
+} else {
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  sb.auth.onAuthStateChange((_e, sessie) => {
+    const nieuw = sessie ? sessie.user : null;
+    if((nieuw && nieuw.id) === (gebruiker && gebruiker.id)) return;
+    gebruiker = nieuw; scherm();
+  });
+  sb.auth.getSession().then(({data}) => { gebruiker = data.session ? data.session.user : null; scherm(); });
+}
+
+function scherm(){
+  toon('inlog', !gebruiker); toon('dash', !!gebruiker);
+  $('kop').innerHTML = gebruiker ? `<span>${esc(gebruiker.email)}</span><button class="btn wit" id="uit">Uitloggen</button>` : '';
+  if(gebruiker){ $('uit').onclick = () => sb.auth.signOut(); laadAlles(); }
+  clearInterval(verversTimer);
+  if(gebruiker) verversTimer = setInterval(() => { if(document.visibilityState==='visible') laadResultaten(true); }, 60000);
+}
+
+/* ============ INLOGGEN / ACCOUNT ============ */
+$('wisselModus').onclick = () => {
+  maakAccount = !maakAccount;
+  $('inlogTitel').textContent = maakAccount ? 'Docentaccount maken' : 'Inloggen als docent';
+  $('inlogKnop').textContent = maakAccount ? 'Account maken' : 'Inloggen';
+  $('ww').autocomplete = maakAccount ? 'new-password' : 'current-password';
+  $('wisselModus').textContent = maakAccount ? 'Heb je al een account? Log in.' : 'Nog geen account? Maak er een.';
+  melding('inlogMelding', maakAccount ? 'Kies een wachtwoord van minstens 8 tekens.' : '');
+};
+$('inlogForm').onsubmit = async e => {
+  e.preventDefault();
+  const email = $('email').value.trim(), ww = $('ww').value;
+  $('inlogKnop').disabled = true; melding('inlogMelding', 'Even geduld…');
+  try{
+    if(maakAccount){
+      const {data, error} = await sb.auth.signUp({email, password: ww});
+      if(error) throw error;
+      if(!data.session) melding('inlogMelding', 'Gelukt! Je krijgt een e-mail. Klik op de link in die mail en log daarna hier in.', 'goed');
+    } else {
+      const {error} = await sb.auth.signInWithPassword({email, password: ww});
+      if(error) throw error;
+      melding('inlogMelding', '');
+    }
+  }catch(err){
+    const t = String(err.message||err);
+    melding('inlogMelding',
+      /invalid login/i.test(t) ? 'E-mailadres of wachtwoord klopt niet.' :
+      /not confirmed/i.test(t) ? 'Je e-mailadres is nog niet bevestigd. Klik eerst op de link in de mail.' :
+      /already registered/i.test(t) ? 'Dit e-mailadres heeft al een account. Log in.' :
+      /signups not allowed/i.test(t) ? 'Nieuwe accounts maken staat uit in Supabase.' : 'Dat lukte niet: ' + t, 'fout');
+  }
+  $('inlogKnop').disabled = false;
+};
+
+/* ============ KLASSEN ============ */
+async function laadAlles(){ await laadKlassen(); await laadResultaten(); }
+async function laadKlassen(){
+  const {data, error} = await sb.from('klassen').select('klascode,klas,gemaakt').order('klas');
+  if(error){ melding('klasMelding', 'Klassen ophalen lukte niet: ' + error.message, 'fout'); return; }
+  KLASSEN = data || [];
+  tekenKlassen();
+  const oud = $('kiesKlas').value;
+  $('kiesKlas').innerHTML = '<option value="">Alle klassen</option>' + KLASSEN.map(k => `<option value="${esc(k.klascode)}">${esc(k.klas)}</option>`).join('');
+  if(KLASSEN.some(k => k.klascode === oud)) $('kiesKlas').value = oud;
+}
+function tekenKlassen(){
+  const aantal = {}; RIJEN.forEach(r => aantal[r.klascode] = (aantal[r.klascode]||0) + 1);
+  $('klassen').innerHTML = KLASSEN.length ? KLASSEN.map(k => `
+    <div class="klas">
+      <div class="naam">${esc(k.klas)}</div>
+      <div class="code">${esc(k.klascode)}</div>
+      <div class="klein">${aantal[k.klascode]||0} leerling(en) in deze app</div>
+      <div class="acties">
+        <button class="btn licht" data-kopieer="${esc(k.klascode)}">Kopieer code</button>
+        <button class="btn gevaar" data-weg="${esc(k.klascode)}" data-naam="${esc(k.klas)}">Verwijder</button>
+      </div>
+    </div>`).join('') : '<div class="leeg">Je hebt nog geen klassen. Maak hieronder je eerste klas.</div>';
+  $('klassen').querySelectorAll('[data-kopieer]').forEach(b => b.onclick = () =>
+    kopieer(b.dataset.kopieer).then(ok => melding('klasMelding', ok ? `Klascode ${b.dataset.kopieer} gekopieerd.` : 'Kopiëren lukte niet.', ok ? 'goed' : 'fout')));
+  $('klassen').querySelectorAll('[data-weg]').forEach(b => b.onclick = async () => {
+    if(!confirm(`Klas ${b.dataset.naam} verwijderen?\n\nLet op: alle resultaten van leerlingen in deze klas worden ook verwijderd (in alle apps).`)) return;
+    const {error} = await sb.from('klassen').delete().eq('klascode', b.dataset.weg);
+    if(error) return melding('klasMelding', 'Verwijderen lukte niet: ' + error.message, 'fout');
+    melding('klasMelding', 'Klas verwijderd.', 'goed'); laadAlles();
+  });
+}
+$('klasForm').onsubmit = async e => {
+  e.preventDefault();
+  const klas = $('nieuweKlas').value.trim(); if(!klas) return;
+  for(let poging = 0; poging < 5; poging++){
+    const code = nieuweCode();
+    const {error} = await sb.from('klassen').insert({klascode: code, klas});
+    if(!error){ $('nieuweKlas').value = ''; melding('klasMelding', `Klas ${klas} gemaakt. De klascode is ${code}.`, 'goed'); return laadKlassen(); }
+    if(error.code !== '23505') return melding('klasMelding', 'Klas maken lukte niet: ' + error.message, 'fout');
+  }
+  melding('klasMelding', 'Klas maken lukte niet. Probeer het opnieuw.', 'fout');
+};
+
+/* ============ RESULTATEN ============ */
+async function laadResultaten(stil){
+  if(!stil) melding('dataMelding', 'Resultaten ophalen…');
+  const {data, error} = await sb.from('voortgang')
+    .select('id,app,klascode,naam,punten,max_punten,samenvatting,gestart,bijgewerkt')
+    .order('bijgewerkt', {ascending: false}).limit(5000);
+  if(error){ melding('dataMelding', 'Resultaten ophalen lukte niet: ' + error.message, 'fout'); return; }
+  RIJEN = data || [];
+  const apps = [...new Set(RIJEN.map(r => r.app))];
+  const oud = $('kiesApp').value;
+  $('kiesApp').innerHTML = apps.length ? apps.map(a => {
+    const r = RIJEN.find(x => x.app === a); const titel = (r.samenvatting && r.samenvatting.titel) || a;
+    return `<option value="${esc(a)}">${esc(titel)}</option>`; }).join('') : '<option value="">(nog geen resultaten)</option>';
+  if(apps.includes(oud)) $('kiesApp').value = oud;
+  melding('dataMelding', stil ? '' : `Bijgewerkt om ${new Date().toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'})}.`);
+  tekenKlassen(); teken();
+}
+['kiesApp','kiesKlas'].forEach(id => $(id).onchange = () => { openId = null; teken(); });
+$('zoek').oninput = () => teken();
+$('ververs').onclick = () => laadAlles();
+
+function klasNaam(code){ const k = KLASSEN.find(x => x.klascode === code); return k ? k.klas : code; }
+function gefilterd(){
+  const app = $('kiesApp').value, klas = $('kiesKlas').value, z = $('zoek').value.trim().toLowerCase();
+  return RIJEN.filter(r => r.app === app && (!klas || r.klascode === klas) && (!z || r.naam.toLowerCase().includes(z)));
+}
+// Bouw per leerling een overzicht per module uit de samenvatting
+function structuur(rijen){
+  let best = null;
+  rijen.forEach(r => { const m = r.samenvatting && r.samenvatting.modules; if(m && (!best || m.length > best.length)) best = m; });
+  return best || [];
+}
+function perModule(r, mods){
+  const v = (r.samenvatting && r.samenvatting.vragen) || {};
+  return mods.map((M, m) => {
+    const tel = sec => { let p = 0, gemaakt = 0; const n = M[sec];
+      for(let i = 0; i < n; i++){ const q = v[m+'-'+sec+'-'+i]; if(q){ p += q.p||0; if(q.d) gemaakt++; } }
+      return {p, max: n*2, gemaakt, n}; };
+    return {opdr: tel('opdr'), toets: tel('toets')};
+  });
+}
+
+function teken(){
+  const rijen = gefilterd(), mods = structuur(rijen);
+  const doel = $('resultaten');
+  if(!rijen.length){ doel.innerHTML = `<div class="leeg">${RIJEN.length ? 'Geen leerlingen gevonden met deze keuze.' : 'Nog geen resultaten. Zodra een leerling zich aanmeldt in de app, verschijnt hij of zij hier.'}</div>`; return; }
+
+  const lln = rijen.map(r => {
+    const pm = perModule(r, mods);
+    const vragen = (r.samenvatting && r.samenvatting.vragen) || {};
+    const totaal = mods.reduce((a, M) => a + M.opdr + M.toets, 0);
+    const gemaakt = Object.values(vragen).filter(q => q.d).length;
+    return {...r, klas: klasNaam(r.klascode), pct: r.max_punten ? r.punten / r.max_punten * 100 : 0, pm, gemaakt, totaal, vragen,
+      toetsPct: (() => { const t = pm.reduce((a, x) => a + x.toets.max, 0); return t ? pm.reduce((a, x) => a + x.toets.p, 0) / t * 100 : 0; })()};
+  });
+
+  // ---- tegels ----
+  const gem = lln.reduce((a, l) => a + l.pct, 0) / lln.length;
+  const week = lln.filter(l => new Date() - new Date(l.bijgewerkt) < 7*864e5).length;
+  const klaar = lln.filter(l => l.totaal && l.gemaakt === l.totaal).length;
+  let h = `<div class="tegels">
+    <div class="tegel"><b>${lln.length}</b><span>leerlingen</span></div>
+    <div class="tegel"><b>${komma(gem,0)}%</b><span>gemiddeld van alle punten</span></div>
+    <div class="tegel"><b>${week}</b><span>actief in de laatste 7 dagen</span></div>
+    <div class="tegel"><b>${klaar}</b><span>hebben alles af</span></div>
+  </div>`;
+
+  // ---- gemiddelde per module ----
+  h += `<h3>Gemiddeld per module</h3><div class="legenda"><span><i class="sw" style="display:inline-block;width:14px;height:10px;border-radius:3px;background:var(--paars)"></i>Opdrachten</span><span><i style="display:inline-block;width:14px;height:10px;border-radius:3px;background:var(--roze)"></i>Mini-toets</span></div><div class="balken">`;
+  mods.forEach((M, m) => {
+    const o = lln.reduce((a, l) => a + l.pm[m].opdr.p, 0) / (lln.length * Math.max(1, M.opdr*2)) * 100;
+    const t = lln.reduce((a, l) => a + l.pm[m].toets.p, 0) / (lln.length * Math.max(1, M.toets*2)) * 100;
+    h += `<div class="balk"><span>${m+1}. ${esc(M.naam)}</span><div class="bak"><div class="vul" style="width:${o}%"></div></div><span>${komma(o,0)}%</span></div>
+          <div class="balk"><span></span><div class="bak"><div class="vul t" style="width:${t}%"></div></div><span>${komma(t,0)}%</span></div>`;
+  });
+  h += `</div>`;
+
+  // ---- tabel ----
+  const kol = [['naam','Naam'],['klas','Klas'],['punten','Punten'],['pct','%'],['toetsPct','Toetsen %'],['gemaakt','Af']]
+    .concat(mods.map((M, m) => ['m'+m, `${m+1}. ${M.naam}`])).concat([['bijgewerkt','Laatst actief']]);
+  const waarde = (l, k) => k[0]==='m' && /^m\d+$/.test(k) ? (() => { const x = l.pm[+k.slice(1)]; return x.opdr.p + x.toets.p; })() : l[k];
+  lln.sort((a, b) => { const x = waarde(a, sortKol), y = waarde(b, sortKol);
+    const c = typeof x === 'string' ? x.localeCompare(y, 'nl') : (x > y ? 1 : x < y ? -1 : 0); return sortOp ? c : -c; });
+  h += `<h3>Per leerling</h3><p class="uitleg">Klik op een leerling voor de resultaten per vraag. Klik op een kolomkop om te sorteren.</p>
+    <div class="tabelwrap"><table id="lltabel"><thead><tr>${kol.map(([k, t]) => `<th data-k="${k}" ${k===sortKol?`aria-sort="${sortOp?'ascending':'descending'}"`:''}>${esc(t)}</th>`).join('')}</tr></thead><tbody>`;
+  lln.forEach(l => {
+    h += `<tr class="lln ${openId===l.id?'open':''}" data-id="${l.id}">
+      <td><b>${esc(l.naam)}</b></td><td>${esc(l.klas)}</td>
+      <td class="num">${l.punten}/${l.max_punten}</td>
+      <td class="num"><span class="pct ${l.pct<55?'lage':''}">${komma(l.pct,0)}%</span></td>
+      <td class="num"><span class="pct ${l.toetsPct<55?'lage':''}">${komma(l.toetsPct,0)}%</span></td>
+      <td class="num">${l.gemaakt}/${l.totaal}</td>
+      ${l.pm.map(x => `<td class="mcel" title="Opdrachten ${x.opdr.p}/${x.opdr.max}, mini-toets ${x.toets.p}/${x.toets.max}">${x.opdr.p}/${x.opdr.max} <small>· toets ${x.toets.p}/${x.toets.max}</small></td>`).join('')}
+      <td>${wanneer(l.bijgewerkt)}</td></tr>`;
+    if(openId === l.id) h += `<tr class="detail"><td colspan="${kol.length}">${detail(l, mods)}</td></tr>`;
+  });
+  h += `</tbody></table></div>
+    <div class="rij" style="margin-top:10px"><button class="btn licht" id="kopieerTabel">📋 Kopieer tabel voor Excel</button><button class="btn licht" id="downloadTabel">⬇ Download als CSV</button></div>
+    <div class="melding" id="tabelMelding"></div>`;
+
+  // ---- moeilijkste vragen ----
+  const stats = [];
+  mods.forEach((M, m) => ['opdr','toets'].forEach(sec => { for(let i = 0; i < M[sec]; i++){
+    const k = m+'-'+sec+'-'+i; const qs = lln.map(l => l.vragen[k]).filter(Boolean);
+    const af = qs.filter(q => q.d);
+    if(af.length < 1) continue;
+    stats.push({k, m, sec, i, n: af.length, eersteKeer: af.filter(q => q.p===2).length / af.length * 100,
+      fout: qs.reduce((a, q) => a + (q.f||0), 0) / qs.length, hulp: qs.filter(q => q.z).length, over: lln.filter(l => l.vragen[k] && l.vragen[k].o && !l.vragen[k].d).length});
+  }}));
+  stats.sort((a, b) => a.eersteKeer - b.eersteKeer || b.fout - a.fout);
+  h += `<h3>Moeilijkste vragen</h3><p class="uitleg">Vragen die de minste leerlingen in één keer goed hadden.</p>`;
+  h += stats.length ? `<div class="tabelwrap"><table class="moeilijk"><thead><tr><th>Vraag</th><th>In één keer goed</th><th>Gem. aantal fouten</th><th>Groene hulp gezien</th><th>Overgeslagen</th></tr></thead><tbody>${
+    stats.slice(0, 8).map(s => `<tr><td>Module ${s.m+1} (${esc(mods[s.m].naam)}) · ${s.sec==='opdr'?'opdracht':'toetsvraag'} ${s.i+1}</td>
+      <td class="num"><span class="pct ${s.eersteKeer<55?'lage':''}">${komma(s.eersteKeer,0)}%</span> <small>(${s.n} lln)</small></td>
+      <td class="num">${komma(s.fout)}</td><td class="num">${s.hulp}</td><td class="num">${s.over}</td></tr>`).join('')}</tbody></table></div>`
+    : '<div class="leeg">Nog te weinig gemaakte vragen.</div>';
+
+  doel.innerHTML = h;
+
+  doel.querySelectorAll('th[data-k]').forEach(th => th.onclick = () => { const k = th.dataset.k; if(sortKol === k) sortOp = !sortOp; else { sortKol = k; sortOp = k==='naam'||k==='klas'; } teken(); });
+  doel.querySelectorAll('tr.lln').forEach(tr => tr.onclick = () => { const id = +tr.dataset.id; openId = openId === id ? null : id; teken(); });
+  doel.querySelectorAll('[data-reset]').forEach(b => b.onclick = async e => {
+    e.stopPropagation();
+    if(!confirm(`Pincode van ${b.dataset.naam} resetten?\n\nDe leerling kiest bij de volgende keer aanmelden zelf een nieuwe pincode. De punten blijven bewaard.`)) return;
+    const {error} = await sb.from('voortgang').update({pin_hash: null}).eq('id', +b.dataset.reset);
+    melding('tabelMelding', error ? 'Resetten lukte niet: ' + error.message : `Pincode van ${b.dataset.naam} is gereset.`, error ? 'fout' : 'goed');
+  });
+  doel.querySelectorAll('[data-wis]').forEach(b => b.onclick = async e => {
+    e.stopPropagation();
+    if(!confirm(`Alle resultaten van ${b.dataset.naam} in deze app verwijderen? Dit kun je niet ongedaan maken.`)) return;
+    const {error} = await sb.from('voortgang').delete().eq('id', +b.dataset.wis);
+    if(error) return melding('tabelMelding', 'Verwijderen lukte niet: ' + error.message, 'fout');
+    openId = null; laadResultaten();
+  });
+  $('kopieerTabel').onclick = () => kopieer(csv(lln, mods, '\t')).then(ok => melding('tabelMelding', ok ? 'Gekopieerd! Plak in Excel met Ctrl+V.' : 'Kopiëren lukte niet.', ok ? 'goed' : 'fout'));
+  $('downloadTabel').onclick = () => {
+    const blob = new Blob(['﻿' + csv(lln, mods, ';')], {type: 'text/csv;charset=utf-8'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = `resultaten-${$('kiesApp').value}-${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(a); a.click(); a.remove();
+  };
+}
+
+function detail(l, mods){
+  let h = `<div class="legenda">
+    <span><i class="bol p2"></i>2 punten</span><span><i class="bol p1"></i>1 punt</span>
+    <span><i class="bol bezig"></i>bezig, nog niet goed</span><span><i class="bol over"></i>overgeslagen</span>
+    <span><i class="bol hulp"></i>rode rand = groene hulp gezien (4 fouten)</span><span><i class="bol"></i>nog niet gemaakt</span></div>`;
+  mods.forEach((M, m) => {
+    const bol = (sec, i) => { const q = l.vragen[m+'-'+sec+'-'+i];
+      let cl = '', tip = 'nog niet gemaakt';
+      if(q){ if(q.d){ cl = q.p===2 ? 'p2' : 'p1'; tip = `${q.p} punt(en)`; } else if(q.o && !q.f){ cl = 'over'; tip = 'overgeslagen'; } else { cl = 'bezig'; tip = 'nog niet goed'; }
+        tip += `, ${q.f||0} keer fout, ${q.h||0} hint(s)`; if(q.z) cl += ' hulp'; }
+      return `<span class="bol ${cl}" title="${sec==='opdr'?'Opdracht':'Toetsvraag'} ${i+1}: ${tip}">${i+1}</span>`; };
+    h += `<div class="mod-detail"><div class="titel">${m+1}. ${esc(M.naam)}</div><div class="bolletjes">
+      ${Array.from({length: M.opdr}, (_, i) => bol('opdr', i)).join('')}<span class="sep"></span><b style="font-size:.8rem;color:var(--roze)">Toets:</b>
+      ${Array.from({length: M.toets}, (_, i) => bol('toets', i)).join('')}</div></div>`;
+  });
+  h += `<div class="rij" style="margin-top:8px"><span class="uitleg">Begonnen: ${wanneer(l.gestart)}</span>
+    <button class="btn licht" data-reset="${l.id}" data-naam="${esc(l.naam)}">🔑 Pincode resetten</button>
+    <button class="btn gevaar" data-wis="${l.id}" data-naam="${esc(l.naam)}">Verwijder resultaten</button></div>`;
+  return h;
+}
+
+function csv(lln, mods, sep){
+  const kop = ['Naam','Klas','Punten','MaxPunten','Percentage','Toetsen %','Vragen af','Totaal vragen','Laatst actief',
+    ...mods.flatMap((M, m) => [`M${m+1} opdrachten`, `M${m+1} mini-toets`])];
+  const schoon = x => { x = String(x).replace(/[\t\r\n;]/g, ' '); return /^[=+\-@]/.test(x) ? "'" + x : x; };  // geen formules in Excel
+  return [kop.join(sep), ...lln.map(l => [l.naam, l.klas, l.punten, l.max_punten, komma(l.pct,0)+'%', komma(l.toetsPct,0)+'%', l.gemaakt, l.totaal,
+    new Date(l.bijgewerkt).toLocaleString('nl-NL'), ...l.pm.flatMap(x => [x.opdr.p, x.toets.p])].map(schoon).join(sep))].join('\r\n');
+}
+function kopieer(tekst){
+  const oud = () => { const ta = document.createElement('textarea'); ta.value = tekst; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+    document.body.appendChild(ta); ta.select(); let ok = false; try{ ok = document.execCommand('copy'); }catch(e){} ta.remove(); return ok; };
+  if(navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(tekst).then(() => true).catch(() => oud());
+  return Promise.resolve(oud());
+}
+</script>
+</body>
+</html>
